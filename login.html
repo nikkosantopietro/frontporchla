@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Front Porch LA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF7; --sand: #E8DDD0;
+    --clay: #C4A882; --terra: #B5652A; --charcoal: #2C2825;
+    --mid: #6B6058; --light: #9B9088; --green: #3D5A47;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; display: flex; flex-direction: column; }
+  nav { padding: 24px 48px; background: var(--warm-white); border-bottom: 1px solid var(--sand); display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; color: var(--charcoal); letter-spacing: -0.3px; text-decoration: none; }
+  .logo span { color: var(--terra); font-style: italic; }
+  .nav-back { font-size: 13px; color: var(--mid); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+  .nav-back:hover { color: var(--charcoal); }
+  main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 60px 24px; }
+  .login-card { background: var(--warm-white); border: 1px solid var(--sand); border-radius: 24px; padding: 52px 48px; width: 100%; max-width: 420px; box-shadow: 0 4px 40px rgba(44,40,37,0.08); }
+  .card-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 2.5px; text-transform: uppercase; color: var(--terra); margin-bottom: 12px; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--charcoal); letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 8px; }
+  .card-title em { font-style: italic; color: var(--terra); }
+  .card-sub { font-size: 14px; color: var(--mid); font-weight: 300; margin-bottom: 36px; line-height: 1.6; }
+  .form-group { margin-bottom: 20px; }
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--mid); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+  input { width: 100%; padding: 14px 16px; background: var(--cream); border: 1px solid var(--sand); border-radius: 10px; font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--charcoal); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+  input::placeholder { color: var(--light); }
+  input:focus { border-color: var(--terra); box-shadow: 0 0 0 3px rgba(181,101,42,0.1); }
+  input.error { border-color: #C0392B; box-shadow: 0 0 0 3px rgba(192,57,43,0.1); }
+  .form-forgot { text-align: right; margin-top: 8px; }
+  .form-forgot a { font-size: 12px; color: var(--light); text-decoration: none; transition: color 0.2s; }
+  .form-forgot a:hover { color: var(--terra); }
+  .error-message { display: none; background: #FAE8E8; border: 1px solid #F0BABA; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #A32D2D; margin-bottom: 20px; line-height: 1.5; }
+  .error-message.visible { display: block; }
+  .btn-signin { width: 100%; padding: 15px; background: var(--terra); color: white; border: none; border-radius: 100px; font-size: 15px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-top: 8px; transition: background 0.2s, opacity 0.2s; letter-spacing: 0.2px; }
+  .btn-signin:hover { background: #9e5522; }
+  .btn-signin:disabled { opacity: 0.6; cursor: not-allowed; }
+  .divider { display: flex; align-items: center; gap: 12px; margin: 28px 0; }
+  .divider-line { flex: 1; height: 1px; background: var(--sand); }
+  .divider-text { font-size: 11px; color: var(--light); text-transform: uppercase; letter-spacing: 1px; }
+  .invite-notice { background: var(--cream); border: 1px solid var(--sand); border-radius: 12px; padding: 16px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .invite-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--terra); flex-shrink: 0; margin-top: 5px; }
+  .invite-text { font-size: 13px; color: var(--mid); line-height: 1.6; font-weight: 300; }
+  .invite-text strong { color: var(--charcoal); font-weight: 500; }
+  .card-footer { margin-top: 32px; text-align: center; font-size: 12px; color: var(--light); }
+  .card-footer a { color: var(--terra); text-decoration: none; }
+  .tagline { text-align: center; margin-top: 32px; margin-bottom: 40px; font-family: 'Playfair Display', serif; font-size: 14px; font-style: italic; color: var(--light); letter-spacing: 0.3px; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
+  .shake { animation: shake 0.4s ease; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">front porch <span>la</span></a>
+  <a href="index.html" class="nav-back">← Back to home</a>
+</nav>
+
+<main>
+  <div class="login-card">
+    <div class="card-eyebrow">Agent portal</div>
+    <h1 class="card-title">Welcome <em>back.</em></h1>
+    <p class="card-sub">Sign in to your Front Porch LA dashboard to view your zones, subscribers, and morning hot list.</p>
+
+    <div class="error-message" id="errorMsg">
+      Incorrect email or password. Please try again.
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" id="email" placeholder="you@theagencyre.com" autocomplete="email" required/>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••••" autocomplete="current-password" required/>
+        <div class="form-forgot"><a href="#">Forgot password?</a></div>
+      </div>
+      <button type="submit" class="btn-signin" id="signinBtn">Sign in to your porch</button>
+    </form>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-text">Access</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="invite-notice">
+      <div class="invite-dot"></div>
+      <p class="invite-text">
+        <strong>Invite only.</strong> Front Porch LA is currently in private beta.
+        If you'd like access, reach out to
+        <a href="mailto:nikko@frontporchla.com" style="color:var(--terra);text-decoration:none;">nikko@frontporchla.com</a>
+      </p>
+    </div>
+
+    <div class="card-footer">
+      <a href="index.html">frontporchla.com</a> &nbsp;·&nbsp; Westside LA
+    </div>
+  </div>
+</main>
+
+<div class="tagline">Pull up a chair.</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://gykkvpfbyjllomthdlmw.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_bOBUK_TtANfu365rkKlj1w_wHuMWT-y';
+
+  const { createClient } = supabase;
+  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const form = document.getElementById('loginForm');
+  const btn = document.getElementById('signinBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+    errorMsg.classList.remove('visible');
+    emailInput.classList.remove('error');
+    passwordInput.classList.remove('error');
+
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      btn.disabled = false;
+      btn.textContent = 'Sign in to your porch';
+      errorMsg.classList.add('visible');
+      emailInput.classList.add('error');
+      passwordInput.classList.add('error');
+      document.querySelector('.login-card').classList.add('shake');
+      setTimeout(() => document.querySelector('.login-card').classList.remove('shake'), 400);
+      return;
+    }
+
+    btn.textContent = 'Welcome back ✓';
+    btn.style.background = '#3D5A47';
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+  });
+
+  async function checkSession() {
+    const { data: { session } } = await client.auth.getSession();
+    if (session) window.location.href = 'dashboard.html';
+  }
+
+  checkSession();
+</script>
+
+</body>
+</html>
