@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF7; --sand: #E8DDD0;
+    --clay: #C4A882; --terra: #B5652A; --charcoal: #2C2825;
+    --mid: #6B6058; --light: #9B9088; --green: #3D5A47; --green-light: #EBF0EC;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); overflow-x: hidden; }
+
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 48px; background: var(--warm-white); border-bottom: 1px solid var(--sand); position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 21px; color: var(--charcoal); letter-spacing: -0.3px; }
+  .logo span { color: var(--terra); font-style: italic; }
+  nav ul { list-style: none; display: flex; gap: 32px; align-items: center; }
+  nav ul li a { text-decoration: none; font-size: 12px; font-weight: 500; color: var(--mid); letter-spacing: 0.8px; text-transform: uppercase; transition: color 0.2s; }
+  nav ul li a:hover { color: var(--charcoal); }
+  .nav-cta { background: var(--charcoal) !important; color: var(--cream) !important; padding: 10px 22px !important; border-radius: 100px !important; text-transform: none !important; letter-spacing: 0 !important; font-size: 13px !important; }
+
+  .hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 540px; background: var(--warm-white); }
+  .hero-left { padding: 72px 52px; display: flex; flex-direction: column; justify-content: center; gap: 24px; }
+  .eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 2.5px; text-transform: uppercase; color: var(--terra); }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: 50px; line-height: 1.1; letter-spacing: -1px; }
+  .hero h1 em { font-style: italic; color: var(--terra); }
+  .hero-sub { font-size: 15px; line-height: 1.7; color: var(--mid); max-width: 380px; font-weight: 300; }
+  .hero-actions { display: flex; gap: 14px; align-items: center; margin-top: 8px; }
+  .btn-primary { background: var(--terra); color: white; padding: 14px 28px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+  .btn-primary:hover { background: #9e5522; }
+  .btn-ghost { background: none; color: var(--mid); font-size: 14px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px; }
+
+  .hero-right { position: relative; background: #ddd8cf; overflow: hidden; }
+  .map-mock { width: 100%; height: 100%; position: relative; min-height: 480px; }
+  .map-mock::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(170,160,150,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(170,160,150,0.35) 1px, transparent 1px); background-size: 44px 44px; }
+  .road { position: absolute; background: rgba(255,255,255,0.65); border-radius: 2px; }
+  .map-card { position: absolute; bottom: 28px; right: 20px; background: white; border-radius: 16px; padding: 18px 20px; width: 196px; box-shadow: 0 4px 28px rgba(0,0,0,0.13); }
+  .map-card-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--light); margin-bottom: 3px; font-family: 'DM Sans', sans-serif; }
+  .map-card-value { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--charcoal); margin-bottom: 10px; }
+  .map-card-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--mid); padding: 5px 0; border-top: 1px solid var(--sand); font-family: 'DM Sans', sans-serif; }
+  .map-card-row span:last-child { font-weight: 500; color: var(--charcoal); }
+  .pin { position: absolute; display: flex; flex-direction: column; align-items: center; animation: pinPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes pinPop { from { transform: scale(0) translateY(8px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .pin-bubble { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; padding: 5px 10px; border-radius: 100px; white-space: nowrap; }
+  .pin-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 3px; }
+  .pin.sold .pin-bubble { background: var(--terra); color: white; }
+  .pin.sold .pin-dot { background: var(--terra); }
+  .pin.active .pin-bubble { background: var(--green); color: white; }
+  .pin.active .pin-dot { background: var(--green); }
+  .pin.neutral .pin-bubble { background: var(--charcoal); color: white; }
+  .pin.neutral .pin-dot { background: var(--charcoal); }
+
+  .stats-bar { background: var(--charcoal); display: flex; justify-content: center; gap: 72px; padding: 32px 48px; }
+  .stat { text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 30px; color: var(--cream); letter-spacing: -0.5px; }
+  .stat-label { font-size: 11px; color: var(--light); margin-top: 4px; letter-spacing: 0.8px; text-transform: uppercase; }
+
+  .features { padding: 80px 48px; background: var(--cream); }
+  .features-header { text-align: center; margin-bottom: 52px; }
+  .features-header h2 { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--charcoal); letter-spacing: -0.5px; }
+  .features-header p { font-size: 15px; color: var(--mid); margin-top: 10px; font-weight: 300; }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 940px; margin: 0 auto; }
+  .feature-card { background: var(--warm-white); border-radius: 20px; padding: 34px 30px; border: 1px solid var(--sand); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+  .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(44,40,37,0.09); }
+  .feature-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; font-size: 18px; }
+  .icon-a { background: #FAF0E8; } .icon-b { background: var(--green-light); } .icon-c { background: #F5EFE8; }
+  .icon-d { background: #EEF2FA; } .icon-e { background: #FAF0E8; } .icon-f { background: #F2EEF8; }
+  .feature-card h3 { font-family: 'Playfair Display', serif; font-size: 19px; color: var(--charcoal); margin-bottom: 9px; }
+  .feature-card p { font-size: 13px; line-height: 1.7; color: var(--mid); font-weight: 300; }
+
+  .preview-section { background: var(--warm-white); padding: 80px 48px; }
+  .preview-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; max-width: 1000px; margin: 0 auto; }
+  .preview-text h2 { font-family: 'Playfair Display', serif; font-size: 36px; line-height: 1.15; color: var(--charcoal); margin-bottom: 16px; letter-spacing: -0.5px; }
+  .preview-text p { font-size: 15px; line-height: 1.7; color: var(--mid); font-weight: 300; margin-bottom: 28px; }
+  .email-mock { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 40px rgba(44,40,37,0.11); }
+  .email-head { background: var(--charcoal); padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; }
+  .email-logo { font-family: 'Playfair Display', serif; color: var(--cream); font-size: 15px; }
+  .email-logo span { color: var(--clay); font-style: italic; }
+  .email-badge { font-size: 9px; background: var(--terra); color: white; padding: 4px 10px; border-radius: 100px; letter-spacing: 0.8px; text-transform: uppercase; }
+  .email-body { padding: 24px 22px; }
+  .email-zone { font-size: 10px; color: var(--terra); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+  .email-subject { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--charcoal); margin-bottom: 18px; }
+  .email-listing { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--sand); }
+  .listing-thumb { width: 58px; height: 48px; background: var(--sand); border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .listing-info { flex: 1; }
+  .listing-addr { font-size: 12px; font-weight: 500; color: var(--charcoal); margin-bottom: 2px; font-family: 'DM Sans', sans-serif; }
+  .listing-details { font-size: 10px; color: var(--mid); margin-bottom: 3px; font-family: 'DM Sans', sans-serif; }
+  .listing-price { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--terra); }
+  .listing-tag { font-size: 9px; padding: 3px 8px; border-radius: 100px; font-weight: 500; flex-shrink: 0; align-self: flex-start; margin-top: 2px; font-family: 'DM Sans', sans-serif; }
+  .tag-sold { background: #FAE8E8; color: #A32D2D; }
+  .tag-new { background: var(--green-light); color: var(--green); }
+
+  .score-section { background: var(--cream); padding: 80px 48px; }
+  .score-inner { max-width: 900px; margin: 0 auto; }
+  .score-header { margin-bottom: 36px; }
+  .score-header h2 { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--charcoal); letter-spacing: -0.5px; margin-bottom: 8px; }
+  .score-header p { font-size: 15px; color: var(--mid); font-weight: 300; }
+  .score-card { background: var(--warm-white); border-radius: 16px; border: 1px solid var(--sand); overflow: hidden; }
+  .score-row { display: flex; align-items: center; gap: 16px; padding: 16px 24px; border-bottom: 1px solid var(--sand); transition: background 0.15s; cursor: pointer; }
+  .score-row:last-child { border-bottom: none; }
+  .score-row:hover { background: var(--cream); }
+  .score-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; font-family: 'DM Sans', sans-serif; }
+  .av-red { background: #FAE8E8; color: #A32D2D; }
+  .av-amber { background: #FEF3DC; color: #854F0B; }
+  .av-gray { background: var(--sand); color: var(--mid); }
+  .score-name { font-size: 13px; font-weight: 500; color: var(--charcoal); font-family: 'DM Sans', sans-serif; }
+  .score-zone { font-size: 11px; color: var(--light); font-family: 'DM Sans', sans-serif; }
+  .score-activity { font-size: 11px; color: var(--mid); flex: 1; font-family: 'DM Sans', sans-serif; }
+  .score-pill { font-size: 10px; padding: 4px 12px; border-radius: 100px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+  .pill-hot { background: #FAE8E8; color: #A32D2D; }
+  .pill-warm { background: #FEF3DC; color: #854F0B; }
+  .pill-cold { background: var(--sand); color: var(--mid); }
+  .score-btn { font-size: 11px; color: var(--terra); font-weight: 500; background: none; border: 1px solid var(--terra); cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 6px 12px; border-radius: 100px; transition: all 0.2s; }
+  .score-btn:hover { background: var(--terra); color: white; }
+
+  footer { background: var(--charcoal); padding: 40px 48px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-logo { font-family: 'Playfair Display', serif; color: var(--cream); font-size: 18px; }
+  .footer-logo span { color: var(--clay); font-style: italic; }
+  footer p { font-size: 12px; color: var(--light); font-family: 'DM Sans', sans-serif; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">front porch <span>la</span></div>
+  <ul>
+    <li><a href="#">How it works</a></li>
+    <li><a href="#">Markets</a></li>
+    <li><a href="#">For agents</a></li>
+    <li><a href="#" class="nav-cta">Request access</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="hero-left">
+    <div class="eyebrow">Westside LA · Pull up a chair.</div>
+    <h1>Know your market <em>before</em> it moves</h1>
+    <p class="hero-sub">Draw any area on the map. Know instantly when homes sell, list, or change price — and know exactly which clients are ready to move.</p>
+    <div class="hero-actions">
+      <button class="btn-primary">Draw your first zone</button>
+      <button class="btn-ghost">See a sample report →</button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="map-mock">
+      <div class="road" style="top:33%;left:0;width:100%;height:3px;"></div>
+      <div class="road" style="top:61%;left:0;width:100%;height:5px;"></div>
+      <div class="road" style="left:28%;top:0;width:3px;height:100%;"></div>
+      <div class="road" style="left:57%;top:0;width:5px;height:100%;"></div>
+      <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 420 480" preserveAspectRatio="none">
+        <polygon points="85,65 290,50 320,195 245,268 75,238" fill="rgba(181,101,42,0.11)" stroke="#B5652A" stroke-width="1.8" stroke-dasharray="7 4"/>
+      </svg>
+      <div class="pin sold" style="top:20%;left:36%;animation-delay:0.1s"><div class="pin-bubble">$3.2M — Sold</div><div class="pin-dot"></div></div>
+      <div class="pin active" style="top:37%;left:54%;animation-delay:0.25s"><div class="pin-bubble">$2.85M — Active</div><div class="pin-dot"></div></div>
+      <div class="pin sold" style="top:50%;left:26%;animation-delay:0.4s"><div class="pin-bubble">$4.1M — Sold</div><div class="pin-dot"></div></div>
+      <div class="pin neutral" style="top:28%;left:66%;animation-delay:0.15s"><div class="pin-bubble">$1.95M</div><div class="pin-dot"></div></div>
+      <div class="map-card">
+        <div class="map-card-label">Brentwood Park</div>
+        <div class="map-card-value">$3.4M</div>
+        <div class="map-card-row"><span>Avg sold price</span><span>↑ 4.2%</span></div>
+        <div class="map-card-row"><span>Sales this month</span><span>7</span></div>
+        <div class="map-card-row"><span>Avg days on market</span><span>18</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">158M+</div><div class="stat-label">Properties tracked</div></div>
+  <div class="stat"><div class="stat-num">~30 min</div><div class="stat-label">IDX data refresh</div></div>
+  <div class="stat"><div class="stat-num">CLAW</div><div class="stat-label">MLS licensed</div></div>
+  <div class="stat"><div class="stat-num">3–7 day</div><div class="stat-label">Recorder data lag</div></div>
+</div>
+
+<div class="features">
+  <div class="features-header">
+    <h2>Intelligence that feels personal</h2>
+    <p>Not another portal. A market lens shaped to your world.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon icon-a">✏️</div><h3>Draw your zones</h3><p>Sketch any shape on the map. Define neighborhoods the way you actually know them — not by ZIP code.</p></div>
+    <div class="feature-card"><div class="feature-icon icon-b">📬</div><h3>Monthly zone reports</h3><p>Every subscriber gets a curated market update specific to their zone — sold prices, active listings, lease activity.</p></div>
+    <div class="feature-card"><div class="feature-icon icon-c">📈</div><h3>Home value estimate</h3><p>Each report includes a current estimate for the subscriber's specific address — powered by live market data.</p></div>
+    <div class="feature-card"><div class="feature-icon icon-d">🎯</div><h3>Engagement scoring</h3><p>See exactly who opened, who clicked, and how many times. Your hottest leads surface automatically.</p></div>
+    <div class="feature-card"><div class="feature-icon icon-e">📞</div><h3>Daily hot list</h3><p>Every morning, your top subscribers ranked by activity. Know who to call, and exactly why, before you dial.</p></div>
+    <div class="feature-card"><div class="feature-icon icon-f">✍️</div><h3>AI market story</h3><p>Each zone gets a custom-written narrative generated from real data — no two zones ever tell the same story.</p></div>
+  </div>
+</div>
+
+<div class="preview-section">
+  <div class="preview-inner">
+    <div class="preview-text">
+      <h2>Your clients get the news. You get the credit.</h2>
+      <p>Every alert carries your name. When a home sells on their street, they hear it from you first — not Zillow. And when they're ready to move, you'll already know.</p>
+      <button class="btn-primary">See a sample report</button>
+    </div>
+    <div class="email-mock">
+      <div class="email-head">
+        <div class="email-logo">front porch <span>la</span></div>
+        <div class="email-badge">Monthly update</div>
+      </div>
+      <div class="email-body">
+        <div class="email-zone">Brentwood Park · Your zone</div>
+        <div class="email-subject">2 new sales in your neighborhood</div>
+        <div class="email-listing">
+          <div class="listing-thumb">🏡</div>
+          <div class="listing-info">
+            <div class="listing-addr">324 Amalfi Dr</div>
+            <div class="listing-details">4 bd · 3 ba · 2,840 sqft</div>
+            <div class="listing-price">$3,200,000</div>
+          </div>
+          <div class="listing-tag tag-sold">Sold</div>
+        </div>
+        <div class="email-listing">
+          <div class="listing-thumb">🏠</div>
+          <div class="listing-info">
+            <div class="listing-addr">189 Halvern Dr</div>
+            <div class="listing-details">3 bd · 2 ba · 1,960 sqft</div>
+            <div class="listing-price">$2,850,000</div>
+          </div>
+          <div class="listing-tag tag-new">Active</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="score-section">
+  <div class="score-inner">
+    <div class="score-header">
+      <h2>Your morning hot list</h2>
+      <p>Subscribers ranked by engagement this month. The people most likely to move are already at the top.</p>
+    </div>
+    <div class="score-card">
+      <div class="score-row">
+        <div class="score-avatar av-red">SR</div>
+        <div><div class="score-name">Sarah Reinhart</div><div class="score-zone">Brentwood Park</div></div>
+        <div class="score-activity">Checked home value 6× · Opened report</div>
+        <div class="score-pill pill-hot">Hot</div>
+        <button class="score-btn">Email</button>
+      </div>
+      <div class="score-row">
+        <div class="score-avatar av-amber">MK</div>
+        <div><div class="score-name">Michael Kaplan</div><div class="score-zone">Palisades Riviera</div></div>
+        <div class="score-activity">Clicked 3 listings · Opened report</div>
+        <div class="score-pill pill-warm">Warm</div>
+        <button class="score-btn">Email</button>
+      </div>
+      <div class="score-row">
+        <div class="score-avatar av-gray">JL</div>
+        <div><div class="score-name">Jennifer Lowe</div><div class="score-zone">Brentwood Park</div></div>
+        <div class="score-activity">Opened report · No clicks</div>
+        <div class="score-pill pill-cold">Cold</div>
+        <button class="score-btn">Email</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">front porch <span>la</span></div>
+  <p>Westside LA · Powered by CLAW MLS · © 2026 Front Porch LA</p>
+</footer>
+
+</body>
