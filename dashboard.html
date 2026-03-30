@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Front Porch LA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF7; --sand: #E8DDD0;
+    --clay: #C4A882; --terra: #B5652A; --charcoal: #2C2825;
+    --mid: #6B6058; --light: #9B9088; --green: #3D5A47; --green-light: #EBF0EC;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; }
+
+  /* NAV */
+  nav { background: var(--charcoal); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--cream); text-decoration: none; }
+  .nav-logo span { color: var(--clay); font-style: italic; }
+  .nav-right { display: flex; align-items: center; gap: 20px; }
+  .nav-user { font-size: 13px; color: var(--light); }
+  .nav-user strong { color: var(--cream); font-weight: 500; }
+  .btn-signout { font-size: 12px; color: var(--light); background: none; border: 1px solid rgba(255,255,255,0.15); padding: 7px 16px; border-radius: 100px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-signout:hover { color: var(--cream); border-color: rgba(255,255,255,0.4); }
+
+  /* MAIN */
+  main { max-width: 1100px; margin: 0 auto; padding: 40px; }
+
+  /* GREETING */
+  .greeting { margin-bottom: 36px; }
+  .greeting-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--terra); margin-bottom: 6px; }
+  .greeting h1 { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--charcoal); letter-spacing: -0.5px; }
+  .greeting h1 em { font-style: italic; color: var(--terra); }
+  .greeting-date { font-size: 13px; color: var(--light); margin-top: 4px; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: var(--warm-white); border: 1px solid var(--sand); border-radius: 16px; padding: 22px 24px; }
+  .stat-card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--light); margin-bottom: 8px; }
+  .stat-card-value { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--charcoal); letter-spacing: -0.5px; }
+  .stat-card-sub { font-size: 12px; color: var(--mid); margin-top: 4px; }
+  .stat-card-up { color: var(--green); }
+  .stat-card-terra { color: var(--terra); }
+
+  /* TWO COL LAYOUT */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+
+  /* SECTION HEADERS */
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--charcoal); }
+  .section-link { font-size: 12px; color: var(--terra); text-decoration: none; font-weight: 500; }
+  .section-link:hover { text-decoration: underline; }
+
+  /* STATUS DASHBOARD */
+  .status-card { background: var(--warm-white); border: 1px solid var(--sand); border-radius: 16px; padding: 24px; }
+  .status-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--sand); }
+  .status-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .status-row:first-child { padding-top: 0; }
+  .status-left { display: flex; align-items: center; gap: 12px; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green { background: #4CAF50; box-shadow: 0 0 6px rgba(76,175,80,0.4); }
+  .dot-amber { background: #FF9800; box-shadow: 0 0 6px rgba(255,152,0,0.4); }
+  .dot-red { background: #F44336; box-shadow: 0 0 6px rgba(244,67,54,0.4); }
+  .status-name { font-size: 13px; font-weight: 500; color: var(--charcoal); }
+  .status-detail { font-size: 11px; color: var(--light); margin-top: 2px; }
+  .status-time { font-size: 11px; color: var(--light); }
+
+  /* HOT LIST */
+  .hotlist-card { background: var(--warm-white); border: 1px solid var(--sand); border-radius: 16px; overflow: hidden; }
+  .hotlist-row { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--sand); transition: background 0.15s; cursor: pointer; }
+  .hotlist-row:last-child { border-bottom: none; }
+  .hotlist-row:hover { background: var(--cream); }
+  .hotlist-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+  .av-red { background: #FAE8E8; color: #A32D2D; }
+  .av-amber { background: #FEF3DC; color: #854F0B; }
+  .av-gray { background: var(--sand); color: var(--mid); }
+  .hotlist-info { flex: 1; }
+  .hotlist-name { font-size: 13px; font-weight: 500; color: var(--charcoal); }
+  .hotlist-detail { font-size: 11px; color: var(--mid); margin-top: 2px; }
+  .hotlist-pill { font-size: 10px; padding: 3px 10px; border-radius: 100px; font-weight: 500; }
+  .pill-hot { background: #FAE8E8; color: #A32D2D; }
+  .pill-warm { background: #FEF3DC; color: #854F0B; }
+  .pill-cold { background: var(--sand); color: var(--mid); }
+  .hotlist-score { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--charcoal); min-width: 28px; text-align: right; }
+  .btn-email { font-size: 11px; color: var(--terra); background: none; border: 1px solid var(--terra); padding: 5px 12px; border-radius: 100px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; white-space: nowrap; }
+  .btn-email:hover { background: var(--terra); color: white; }
+
+  /* ZONES */
+  .zones-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .zone-card { background: var(--warm-white); border: 1px solid var(--sand); border-radius: 16px; padding: 22px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+  .zone-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(44,40,37,0.08); }
+  .zone-name { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--charcoal); margin-bottom: 4px; }
+  .zone-subs { font-size: 12px; color: var(--light); margin-bottom: 16px; }
+  .zone-stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .zone-stat-label { font-size: 11px; color: var(--mid); }
+  .zone-stat-value { font-size: 11px; font-weight: 500; color: var(--charcoal); }
+  .zone-badge { display: inline-block; font-size: 10px; padding: 3px 10px; border-radius: 100px; font-weight: 500; margin-top: 12px; }
+  .badge-active { background: var(--green-light); color: var(--green); }
+  .badge-draft { background: var(--sand); color: var(--mid); }
+
+  /* EMPTY STATE */
+  .empty-state { background: var(--warm-white); border: 1px dashed var(--sand); border-radius: 16px; padding: 40px; text-align: center; }
+  .empty-state-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--mid); margin-bottom: 8px; }
+  .empty-state-sub { font-size: 13px; color: var(--light); margin-bottom: 20px; font-weight: 300; }
+  .btn-add { background: var(--terra); color: white; padding: 10px 24px; border-radius: 100px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+  .btn-add:hover { background: #9e5522; }
+
+  /* NOT AUTHORIZED */
+  #authCheck { display: none; position: fixed; inset: 0; background: var(--cream); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+  #authCheck p { font-size: 15px; color: var(--mid); }
+</style>
+</head>
+<body>
+
+<div id="authCheck">
+  <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--charcoal)">front porch <span style="color:var(--terra);font-style:italic">la</span></div>
+  <p>Checking your session...</p>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">front porch <span>la</span></a>
+  <div class="nav-right">
+    <div class="nav-user">Good morning, <strong id="userEmail">agent</strong></div>
+    <button class="btn-signout" onclick="signOut()">Sign out</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- GREETING -->
+  <div class="greeting">
+    <div class="greeting-eyebrow">Agent portal</div>
+    <h1>Good morning, <em id="firstName">Nikko.</em></h1>
+    <div class="greeting-date" id="todayDate"></div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-card-label">Total subscribers</div>
+      <div class="stat-card-value">0</div>
+      <div class="stat-card-sub">Across all zones</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Hot leads</div>
+      <div class="stat-card-value stat-card-terra">0</div>
+      <div class="stat-card-sub">High engagement this month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Active zones</div>
+      <div class="stat-card-value">0</div>
+      <div class="stat-card-sub">Westside LA</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Next send</div>
+      <div class="stat-card-value" style="font-size:20px;" id="nextSend">—</div>
+      <div class="stat-card-sub">Monthly report</div>
+    </div>
+  </div>
+
+  <!-- STATUS + HOT LIST -->
+  <div class="two-col">
+
+    <!-- STATUS DASHBOARD -->
+    <div>
+      <div class="section-header">
+        <div class="section-title">System status</div>
+      </div>
+      <div class="status-card">
+        <div class="status-row">
+          <div class="status-left">
+            <div class="status-dot dot-amber"></div>
+            <div>
+              <div class="status-name">CLAW IDX feed</div>
+              <div class="status-detail">Pending — IDX agreement in progress</div>
+            </div>
+          </div>
+          <div class="status-time">Not connected</div>
+        </div>
+        <div class="status-row">
+          <div class="status-left">
+            <div class="status-dot dot-green"></div>
+            <div>
+              <div class="status-name">ATTOM recorder data</div>
+              <div class="status-detail">Free trial active</div>
+            </div>
+          </div>
+          <div class="status-time">Ready</div>
+        </div>
+        <div class="status-row">
+          <div class="status-left">
+            <div class="status-dot dot-green"></div>
+            <div>
+              <div class="status-name">BatchData</div>
+              <div class="status-detail">Token active</div>
+            </div>
+          </div>
+          <div class="status-time">Ready</div>
+        </div>
+        <div class="status-row">
+          <div class="status-left">
+            <div class="status-dot dot-green"></div>
+            <div>
+              <div class="status-name">Supabase database</div>
+              <div class="status-detail">PropertyView — West US</div>
+            </div>
+          </div>
+          <div class="status-time">Live</div>
+        </div>
+        <div class="status-row">
+          <div class="status-left">
+            <div class="status-dot dot-amber"></div>
+            <div>
+              <div class="status-name">Email engine</div>
+              <div class="status-detail">SendGrid — not yet configured</div>
+            </div>
+          </div>
+          <div class="status-time">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOT LIST -->
+    <div>
+      <div class="section-header">
+        <div class="section-title">Morning hot list</div>
+        <a href="#" class="section-link">View all →</a>
+      </div>
+      <div class="hotlist-card">
+        <div style="padding:40px;text-align:center;">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--mid);margin-bottom:8px;">No subscribers yet</div>
+          <div style="font-size:13px;color:var(--light);font-weight:300;">Add your first subscriber to start tracking engagement.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ZONES -->
+  <div class="section-header">
+    <div class="section-title">Your zones</div>
+    <a href="#" class="section-link">+ Add zone</a>
+  </div>
+
+  <div class="zones-grid">
+    <div class="empty-state" style="grid-column:1/-1;">
+      <div class="empty-state-title">No zones drawn yet</div>
+      <div class="empty-state-sub">Your hand-drawn Westside value zones will appear here. Each zone becomes a monthly market report for your subscribers.</div>
+      <button class="btn-add">Draw your first zone</button>
+    </div>
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://gykkvpfbyjllomthdlmw.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_bOBUK_TtANfu365rkKlj1w_wHuMWT-y';
+  const { createClient } = supabase;
+  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const authCheck = document.getElementById('authCheck');
+  authCheck.style.display = 'flex';
+
+  async function init() {
+    const { data: { session } } = await client.auth.getSession();
+    if (!session) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    authCheck.style.display = 'none';
+
+    const email = session.user.email;
+    document.getElementById('userEmail').textContent = email;
+
+    const firstName = email.split('@')[0];
+    const display = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    document.getElementById('firstName').textContent = display + '.';
+
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('todayDate').textContent = now.toLocaleDateString('en-US', options);
+
+    const firstOfNext = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const sendOptions = { month: 'long', day: 'numeric' };
+    document.getElementById('nextSend').textContent = firstOfNext.toLocaleDateString('en-US', sendOptions);
+  }
+
+  async function signOut() {
+    await client.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  init();
+</script>
+
+</body>
+</html>
