@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Listings — Front Porch LA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF7; --sand: #E8DDD0;
+    --clay: #C4A882; --terra: #B5652A; --charcoal: #2C2825;
+    --mid: #6B6058; --light: #9B9088; --green: #3D5A47;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { background: var(--charcoal); padding: 14px 40px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--cream); text-decoration: none; }
+  .nav-logo span { color: var(--clay); font-style: italic; }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-link { font-size: 12px; color: var(--light); text-decoration: none; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 500; transition: color 0.2s; }
+  .nav-link:hover { color: var(--cream); }
+  .nav-link.active { color: var(--clay); }
+  .btn-nav { font-size: 12px; padding: 8px 18px; border-radius: 100px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; border: none; }
+  .btn-dashboard { background: var(--terra); color: white; }
+  .btn-dashboard:hover { background: #9e5522; }
+
+  /* HERO BAND */
+  .search-hero { background: var(--warm-white); border-bottom: 1px solid var(--sand); padding: 32px 40px; }
+  .search-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 2.5px; text-transform: uppercase; color: var(--terra); margin-bottom: 8px; }
+  .search-title { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--charcoal); letter-spacing: -0.5px; margin-bottom: 8px; }
+  .search-title em { font-style: italic; color: var(--terra); }
+  .search-sub { font-size: 14px; color: var(--mid); font-weight: 300; max-width: 560px; line-height: 1.6; }
+
+  /* ZONE FILTER BAR */
+  .zone-bar { background: var(--warm-white); border-bottom: 1px solid var(--sand); padding: 14px 40px; display: flex; gap: 10px; align-items: center; overflow-x: auto; }
+  .zone-bar-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--light); font-weight: 500; flex-shrink: 0; margin-right: 4px; }
+  .zone-pill { font-size: 12px; padding: 6px 16px; border-radius: 100px; border: 1px solid var(--sand); background: var(--cream); color: var(--mid); cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'DM Sans', sans-serif; font-weight: 500; flex-shrink: 0; }
+  .zone-pill:hover { border-color: var(--terra); color: var(--terra); }
+  .zone-pill.active { background: var(--terra); color: white; border-color: var(--terra); }
+
+  /* IDX CONTAINER */
+  .idx-container { flex: 1; padding: 0; background: var(--cream); }
+  .idx-wrapper { max-width: 100%; overflow: hidden; background: white; }
+  .idx-wrapper iframe { display: block; width: 100%; border: none; }
+
+  /* DISCLAIMER */
+  .disclaimer { background: var(--charcoal); padding: 20px 40px; text-align: center; }
+  .disclaimer p { font-size: 11px; color: var(--light); line-height: 1.6; max-width: 800px; margin: 0 auto; }
+  .disclaimer a { color: var(--clay); text-decoration: none; }
+
+  /* AUTH CHECK */
+  #authCheck { display: none; position: fixed; inset: 0; background: var(--cream); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+  #authCheck p { font-size: 15px; color: var(--mid); }
+</style>
+</head>
+<body>
+
+<div id="authCheck" style="display:flex;">
+  <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--charcoal)">front porch <span style="color:var(--terra);font-style:italic">la</span></div>
+  <p>Checking your session...</p>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">front porch <span>la</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="zones.html" class="nav-link">Zones</a>
+    <a href="search.html" class="nav-link active">Search</a>
+    <button class="btn-nav btn-dashboard" onclick="window.location.href='dashboard.html'">← Back</button>
+  </div>
+</nav>
+
+<div class="search-hero">
+  <div class="search-eyebrow">CLAW MLS · Live listings</div>
+  <h1 class="search-title">Search the <em>Westside.</em></h1>
+  <p class="search-sub">Live listing data powered by CLAW MLS — active, pending, and sold properties across your zones.</p>
+</div>
+
+<div class="zone-bar" id="zoneBar">
+  <span class="zone-bar-label">Your zones:</span>
+  <div class="zone-pill active" onclick="selectZone(this, 'all')">All listings</div>
+</div>
+
+<div class="idx-container">
+  <div class="idx-wrapper">
+    <script type="text/javascript" src="https://www.themls.com/IDXNET/Scripts/idxwidget.js"></script>
+    <iframe id="idxFrame"
+      style="padding:0; margin:0; padding-top:0px; border:0px solid transparent; background-color:transparent;"
+      frameborder="0"
+      scrolling="no"
+      src="https://www.themls.com/IDXNET/Default.aspx?wid=KytrPJFGpeDDxtw7jkzJ5GoH4pVUQqQnsVDvks3zJoCYYk2rqbHiGAEQLEQL"
+      width="100%"
+      height="900px">
+    </iframe>
+  </div>
+</div>
+
+<div class="disclaimer">
+  <p>Listing data provided by Combined LA/Westside MLS (CLAW/TheMLS™). Information is deemed reliable but not guaranteed. Agent: Nikko Santo Pietro, CA DRE #02221766, The Agency Beverly Hills. &copy; 2026 Front Porch LA.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://gykkvpfbyjllomthdlmw.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_bOBUK_TtANfu365rkKlj1w_wHuMWT-y';
+  const { createClient } = supabase;
+  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function init() {
+    const { data: { session } } = await client.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    document.getElementById('authCheck').style.display = 'none';
+    await loadZonePills();
+  }
+
+  async function loadZonePills() {
+    const { data: { session } } = await client.auth.getSession();
+    if (!session) return;
+    const { data: zones } = await client.from('zones').select('id, name, color').eq('agent_id', session.user.id).order('name');
+    if (!zones || zones.length === 0) return;
+    const bar = document.getElementById('zoneBar');
+    zones.forEach(zone => {
+      const pill = document.createElement('div');
+      pill.className = 'zone-pill';
+      pill.textContent = zone.name;
+      pill.onclick = () => selectZone(pill, zone.id);
+      bar.appendChild(pill);
+    });
+  }
+
+  function selectZone(el, zoneId) {
+    document.querySelectorAll('.zone-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  init();
+</script>
+
+</body>
+</html>
