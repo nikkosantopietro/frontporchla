@@ -15,7 +15,7 @@
   body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; }
 
   /* NAV */
-  nav { background: var(--charcoal); padding: 14px 40px; display: flex; justify-content: space-between; align-items: center; }
+  nav { background: var(--charcoal); padding: 14px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
   .nav-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--cream); text-decoration: none; }
   .nav-logo span { color: var(--clay); font-style: italic; }
   .nav-right { display: flex; gap: 10px; align-items: center; }
@@ -36,7 +36,7 @@
   .header-stat-label { font-size: 11px; color: var(--light); text-transform: uppercase; letter-spacing: 0.8px; }
 
   /* FILTER BAR */
-  .filter-bar { background: var(--warm-white); border-bottom: 1px solid var(--sand); padding: 12px 40px; display: flex; gap: 8px; align-items: center; }
+  .filter-bar { background: var(--warm-white); border-bottom: 1px solid var(--sand); padding: 12px 40px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .filter-pill { font-size: 12px; padding: 6px 16px; border-radius: 100px; border: 1px solid var(--sand); background: var(--cream); color: var(--mid); cursor: pointer; transition: all 0.2s; font-weight: 500; font-family: 'DM Sans', sans-serif; }
   .filter-pill:hover { border-color: var(--terra); color: var(--terra); }
   .filter-pill.active { background: var(--terra); color: white; border-color: var(--terra); }
@@ -52,11 +52,15 @@
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; }
   thead { background: var(--cream); }
-  th { padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--light); font-weight: 500; border-bottom: 1px solid var(--sand); white-space: nowrap; }
+  th { padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--light); font-weight: 500; border-bottom: 1px solid var(--sand); white-space: nowrap; cursor: pointer; user-select: none; }
+  th:hover { color: var(--terra); }
+  th .sort-arrow { display: inline-block; margin-left: 4px; opacity: 0.4; font-size: 10px; }
+  th.sort-asc .sort-arrow::after { content: ' ↑'; opacity: 1; color: var(--terra); }
+  th.sort-desc .sort-arrow::after { content: ' ↓'; opacity: 1; color: var(--terra); }
+  th.sort-asc, th.sort-desc { color: var(--terra); }
   td { padding: 14px 16px; border-bottom: 1px solid var(--sand); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: var(--cream); }
-  tr { cursor: pointer; transition: background 0.15s; }
+  tr.data-row:hover td { background: var(--cream); cursor: pointer; }
 
   /* TABLE CELLS */
   .cell-name { display: flex; align-items: center; gap: 10px; }
@@ -66,7 +70,7 @@
   .cell-zone { display: flex; align-items: center; gap: 6px; }
   .cell-zone-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .cell-zone-name { font-size: 12px; color: var(--mid); }
-  .status-pill { font-size: 10px; padding: 3px 10px; border-radius: 100px; font-weight: 500; }
+  .status-pill { font-size: 10px; padding: 3px 10px; border-radius: 100px; font-weight: 500; text-transform: capitalize; }
   .status-hot { background: #FAE8E8; color: #A32D2D; }
   .status-warm { background: #FEF3DC; color: #854F0B; }
   .status-cold { background: var(--sand); color: var(--mid); }
@@ -75,8 +79,8 @@
   .cell-actions { display: flex; gap: 6px; }
   .action-btn { font-size: 11px; padding: 5px 12px; border-radius: 100px; border: 1px solid var(--sand); background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--mid); transition: all 0.2s; white-space: nowrap; }
   .action-btn:hover { border-color: var(--terra); color: var(--terra); }
-  .action-btn.primary { background: var(--terra); color: white; border-color: var(--terra); }
-  .action-btn.primary:hover { background: #9e5522; }
+  .action-btn.email-btn { background: var(--terra); color: white; border-color: var(--terra); }
+  .action-btn.email-btn:hover { background: #9e5522; }
 
   /* EMPTY STATE */
   .empty-state { padding: 60px 40px; text-align: center; }
@@ -84,7 +88,7 @@
   .empty-sub { font-size: 14px; color: var(--light); margin-bottom: 24px; font-weight: 300; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.6; }
   .btn-empty { background: var(--terra); color: white; padding: 12px 28px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
-  /* MODAL OVERLAY */
+  /* ADD MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,40,37,0.5); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--warm-white); border-radius: 20px; padding: 40px; width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(44,40,37,0.2); max-height: 90vh; overflow-y: auto; }
@@ -98,25 +102,75 @@
   .form-input:focus { border-color: var(--terra); }
   .form-input::placeholder { color: var(--light); }
   .form-select { width: 100%; padding: 11px 14px; background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--charcoal); outline: none; cursor: pointer; }
+
+  /* ZONE BADGE */
+  .zone-badge { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; display: none; align-items: center; gap: 8px; font-weight: 500; }
+  .zone-badge.found { background: var(--green-light); color: var(--green); border: 1px solid #C0DD97; display: flex; }
+  .zone-badge.not-found { background: #FAE8E8; color: #A32D2D; border: 1px solid #F0BABA; display: flex; }
+  .zone-badge-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .zone-badge a { color: inherit; font-weight: 600; }
+
   .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
   .btn-cancel { flex: 1; padding: 12px; background: none; border: 1px solid var(--sand); border-radius: 100px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--mid); cursor: pointer; }
   .btn-submit { flex: 2; padding: 12px; background: var(--terra); color: white; border: none; border-radius: 100px; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; }
   .btn-submit:hover { background: #9e5522; }
   .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  /* ZONE INDICATOR */
-  .zone-indicator { padding: 12px 14px; background: var(--green-light); border: 1px solid #C0DD97; border-radius: 8px; font-size: 13px; color: var(--green); margin-bottom: 14px; display: none; }
-  .zone-indicator.warning { background: #FEF3DC; border-color: #FAC775; color: #854F0B; }
-  .zone-indicator.visible { display: block; }
+  /* PROFILE PANEL */
+  .profile-overlay { display: none; position: fixed; inset: 0; background: rgba(44,40,37,0.4); z-index: 90; }
+  .profile-overlay.open { display: block; }
+  .profile-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 420px; background: var(--warm-white); border-left: 1px solid var(--sand); z-index: 95; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; display: flex; flex-direction: column; }
+  .profile-panel.open { transform: translateX(0); }
+  .profile-header { padding: 24px; border-bottom: 1px solid var(--sand); display: flex; justify-content: space-between; align-items: flex-start; }
+  .profile-close { background: none; border: none; font-size: 20px; color: var(--light); cursor: pointer; line-height: 1; padding: 4px; }
+  .profile-close:hover { color: var(--charcoal); }
+  .profile-avatar-lg { width: 52px; height: 52px; border-radius: 50%; background: var(--sand); color: var(--mid); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 500; margin-bottom: 12px; }
+  .profile-name { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--charcoal); margin-bottom: 4px; }
+  .profile-zone { font-size: 12px; color: var(--mid); display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+  .profile-status-row { display: flex; gap: 8px; align-items: center; }
+  .status-btn { font-size: 11px; padding: 4px 12px; border-radius: 100px; border: 1px solid var(--sand); background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--mid); transition: all 0.2s; }
+  .status-btn.active-status { font-weight: 500; }
+  .status-btn[data-s="hot"].active-status { background: #FAE8E8; color: #A32D2D; border-color: #F0BABA; }
+  .status-btn[data-s="warm"].active-status { background: #FEF3DC; color: #854F0B; border-color: #FAC775; }
+  .status-btn[data-s="cold"].active-status { background: var(--sand); color: var(--mid); border-color: var(--light); }
+  .status-btn[data-s="client"].active-status { background: var(--green-light); color: var(--green); border-color: #C0DD97; }
+
+  .profile-body { padding: 20px 24px; flex: 1; }
+  .profile-section { margin-bottom: 20px; }
+  .profile-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--light); font-weight: 500; margin-bottom: 10px; }
+  .profile-detail-row { display: flex; gap: 8px; font-size: 13px; margin-bottom: 6px; }
+  .profile-detail-label { color: var(--light); width: 60px; flex-shrink: 0; }
+  .profile-detail-value { color: var(--charcoal); font-weight: 500; }
+  .profile-action-row { display: flex; gap: 8px; margin-top: 14px; }
+  .profile-action-btn { flex: 1; padding: 9px; border-radius: 100px; border: 1px solid var(--sand); background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--mid); transition: all 0.2s; text-align: center; }
+  .profile-action-btn:hover { border-color: var(--terra); color: var(--terra); }
+  .profile-action-btn.primary { background: var(--terra); color: white; border-color: var(--terra); }
+  .profile-action-btn.primary:hover { background: #9e5522; }
+
+  /* NOTES */
+  .notes-area { width: 100%; padding: 11px 14px; background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--charcoal); outline: none; resize: vertical; min-height: 80px; transition: border-color 0.2s; }
+  .notes-area:focus { border-color: var(--terra); }
+  .notes-area::placeholder { color: var(--light); }
+  .btn-save-note { margin-top: 8px; padding: 8px 20px; background: var(--charcoal); color: var(--cream); border: none; border-radius: 100px; font-size: 12px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s; }
+  .btn-save-note:hover { background: #444; }
+  .note-history { margin-top: 14px; }
+  .note-entry { padding: 10px 12px; background: var(--cream); border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--sand); }
+  .note-entry-date { font-size: 10px; color: var(--light); margin-bottom: 4px; }
+  .note-entry-text { font-size: 13px; color: var(--charcoal); line-height: 1.5; }
 
   /* TOAST */
-  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--charcoal); color: var(--cream); padding: 12px 24px; border-radius: 100px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--charcoal); color: var(--cream); padding: 12px 24px; border-radius: 100px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
   .toast.visible { opacity: 1; }
   .toast.success { background: var(--green); }
   .toast.error { background: #C0392B; }
 
   /* AUTH CHECK */
   #authCheck { display: none; position: fixed; inset: 0; background: var(--cream); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+
+  /* Google autocomplete dropdown */
+  .pac-container { font-family: 'DM Sans', sans-serif; font-size: 13px; border-radius: 8px; border: 1px solid var(--sand); box-shadow: 0 4px 20px rgba(44,40,37,0.12); margin-top: 2px; }
+  .pac-item { padding: 8px 14px; cursor: pointer; }
+  .pac-item:hover { background: var(--cream); }
 </style>
 </head>
 <body>
@@ -140,28 +194,19 @@
     <h1 class="page-title">Your <em>subscribers.</em></h1>
   </div>
   <div class="header-stats">
-    <div class="header-stat">
-      <div class="header-stat-num" id="totalCount">0</div>
-      <div class="header-stat-label">Total</div>
-    </div>
-    <div class="header-stat">
-      <div class="header-stat-num" id="hotCount" style="color:var(--terra);">0</div>
-      <div class="header-stat-label">Hot</div>
-    </div>
-    <div class="header-stat">
-      <div class="header-stat-num" id="clientCount" style="color:var(--green);">0</div>
-      <div class="header-stat-label">Clients</div>
-    </div>
+    <div class="header-stat"><div class="header-stat-num" id="totalCount">0</div><div class="header-stat-label">Total</div></div>
+    <div class="header-stat"><div class="header-stat-num" id="hotCount" style="color:var(--terra);">0</div><div class="header-stat-label">Hot</div></div>
+    <div class="header-stat"><div class="header-stat-num" id="clientCount" style="color:var(--green);">0</div><div class="header-stat-label">Clients</div></div>
   </div>
 </div>
 
 <div class="filter-bar">
-  <div class="filter-pill active" onclick="filterStatus(this, 'all')">All</div>
-  <div class="filter-pill" onclick="filterStatus(this, 'hot')">Hot</div>
-  <div class="filter-pill" onclick="filterStatus(this, 'warm')">Warm</div>
-  <div class="filter-pill" onclick="filterStatus(this, 'cold')">Cold</div>
-  <div class="filter-pill" onclick="filterStatus(this, 'client')">Clients</div>
-  <input class="filter-search" placeholder="Search by name, email, address..." oninput="filterSearch(this.value)" />
+  <div class="filter-pill active" onclick="filterStatus(this,'all')">All</div>
+  <div class="filter-pill" onclick="filterStatus(this,'hot')">Hot</div>
+  <div class="filter-pill" onclick="filterStatus(this,'warm')">Warm</div>
+  <div class="filter-pill" onclick="filterStatus(this,'cold')">Cold</div>
+  <div class="filter-pill" onclick="filterStatus(this,'client')">Clients</div>
+  <input class="filter-search" placeholder="Search name, email, address..." oninput="filterSearch(this.value)" />
 </div>
 
 <main>
@@ -170,16 +215,15 @@
       <table id="subTable">
         <thead>
           <tr>
-            <th>Subscriber</th>
-            <th>Zone</th>
-            <th>Status</th>
-            <th>Score</th>
-            <th>Added</th>
+            <th onclick="sortBy('name')" id="th-name">Name <span class="sort-arrow"></span></th>
+            <th onclick="sortBy('zone')" id="th-zone">Zone <span class="sort-arrow"></span></th>
+            <th onclick="sortBy('status')" id="th-status">Status <span class="sort-arrow"></span></th>
+            <th onclick="sortBy('score')" id="th-score">Score <span class="sort-arrow"></span></th>
+            <th onclick="sortBy('date')" id="th-date">Added <span class="sort-arrow"></span></th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="subTableBody">
-        </tbody>
+        <tbody id="subTableBody"></tbody>
       </table>
       <div class="empty-state" id="emptyState" style="display:none;">
         <div class="empty-title">No subscribers yet</div>
@@ -190,57 +234,29 @@
   </div>
 </main>
 
-<!-- ADD SUBSCRIBER MODAL -->
+<!-- ADD MODAL -->
 <div class="modal-overlay" id="addModal">
   <div class="modal">
     <div class="modal-title">Add a <em>subscriber.</em></div>
-    <div class="modal-sub">Enter their details and we'll auto-assign them to the right zone based on their address.</div>
+    <div class="modal-sub">Start typing their address and we'll automatically find which zone they belong to.</div>
 
     <div class="form-row">
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">First name *</label>
-        <input class="form-input" id="inp-first" placeholder="Sarah" />
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">Last name *</label>
-        <input class="form-input" id="inp-last" placeholder="Reinhart" />
-      </div>
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">First name *</label><input class="form-input" id="inp-first" placeholder="Sarah" /></div>
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">Last name *</label><input class="form-input" id="inp-last" placeholder="Reinhart" /></div>
     </div>
-
     <div class="form-row">
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">Email</label>
-        <input class="form-input" id="inp-email" type="email" placeholder="sarah@email.com" />
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">Phone</label>
-        <input class="form-input" id="inp-phone" type="tel" placeholder="310-555-0100" />
-      </div>
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">Email</label><input class="form-input" id="inp-email" type="email" placeholder="sarah@email.com" /></div>
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">Phone</label><input class="form-input" id="inp-phone" type="tel" placeholder="310-555-0100" /></div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Home address *</label>
-      <input class="form-input" id="inp-address" placeholder="324 Amalfi Drive" oninput="lookupZone()" />
+      <input class="form-input" id="inp-address" placeholder="Start typing an address..." autocomplete="off" />
     </div>
 
-    <div class="form-row">
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">City</label>
-        <input class="form-input" id="inp-city" placeholder="Los Angeles" />
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">ZIP code</label>
-        <input class="form-input" id="inp-zip" placeholder="90049" oninput="lookupZone()" />
-      </div>
-    </div>
-
-    <div class="zone-indicator" id="zoneIndicator"></div>
-
-    <div class="form-group">
-      <label class="form-label">Assign to zone</label>
-      <select class="form-select" id="inp-zone">
-        <option value="">— Select a zone —</option>
-      </select>
+    <div class="zone-badge" id="zoneBadge">
+      <div class="zone-badge-dot"></div>
+      <span id="zoneBadgeText"></span>
     </div>
 
     <div class="form-group">
@@ -255,12 +271,56 @@
 
     <div class="form-group">
       <label class="form-label">Notes</label>
-      <input class="form-input" id="inp-notes" placeholder="Met at door knock on Amalfi Dr, interested in selling spring 2026" />
+      <input class="form-input" id="inp-notes" placeholder="Met at door knock, interested in selling spring 2026" />
     </div>
 
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
       <button class="btn-submit" id="submitBtn" onclick="addSubscriber()">Add subscriber</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE PANEL -->
+<div class="profile-overlay" id="profileOverlay" onclick="closeProfile()"></div>
+<div class="profile-panel" id="profilePanel">
+  <div class="profile-header">
+    <div>
+      <div class="profile-avatar-lg" id="profileAvatar"></div>
+      <div class="profile-name" id="profileName"></div>
+      <div class="profile-zone" id="profileZone"></div>
+      <div class="profile-status-row">
+        <button class="status-btn" data-s="cold" onclick="updateStatus('cold')">Cold</button>
+        <button class="status-btn" data-s="warm" onclick="updateStatus('warm')">Warm</button>
+        <button class="status-btn" data-s="hot" onclick="updateStatus('hot')">Hot</button>
+        <button class="status-btn" data-s="client" onclick="updateStatus('client')">Client</button>
+      </div>
+    </div>
+    <button class="profile-close" onclick="closeProfile()">×</button>
+  </div>
+
+  <div class="profile-body">
+    <div class="profile-section">
+      <div class="profile-section-label">Contact</div>
+      <div class="profile-detail-row"><span class="profile-detail-label">Email</span><span class="profile-detail-value" id="profileEmail">—</span></div>
+      <div class="profile-detail-row"><span class="profile-detail-label">Phone</span><span class="profile-detail-value" id="profilePhone">—</span></div>
+      <div class="profile-detail-row"><span class="profile-detail-label">Address</span><span class="profile-detail-value" id="profileAddress">—</span></div>
+      <div class="profile-action-row">
+        <button class="profile-action-btn primary" id="profileEmailBtn">Email</button>
+        <button class="profile-action-btn" id="profileCallBtn">Call</button>
+        <button class="profile-action-btn" onclick="deleteCurrentSubscriber()" style="color:#A32D2D;border-color:#F0BABA;">Remove</button>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-label">Add a note</div>
+      <textarea class="notes-area" id="newNoteInput" placeholder="Spoke on the phone — thinking about listing in fall..."></textarea>
+      <button class="btn-save-note" onclick="saveNote()">Save note</button>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-label">Note history</div>
+      <div id="noteHistory"></div>
     </div>
   </div>
 </div>
@@ -279,6 +339,13 @@
   let allZones = [];
   let activeFilter = 'all';
   let searchQuery = '';
+  let sortCol = 'date';
+  let sortDir = 'desc';
+  let selectedSubId = null;
+  let detectedZoneId = null;
+  let detectedLat = null;
+  let detectedLng = null;
+  let autocomplete = null;
 
   async function init() {
     const { data: { session } } = await client.auth.getSession();
@@ -286,19 +353,53 @@
     currentUser = session.user;
     document.getElementById('authCheck').style.display = 'none';
     await Promise.all([loadSubscribers(), loadZones()]);
+    initAutocomplete();
+  }
+
+  function initAutocomplete() {
+    const input = document.getElementById('inp-address');
+    if (!window.google) return;
+    autocomplete = new google.maps.places.Autocomplete(input, {
+      componentRestrictions: { country: 'us' },
+      fields: ['formatted_address', 'geometry', 'address_components']
+    });
+    autocomplete.addListener('place_changed', onPlaceSelected);
+  }
+
+  async function onPlaceSelected() {
+    const place = autocomplete.getPlace();
+    if (!place.geometry) return;
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+    detectedLat = lat;
+    detectedLng = lng;
+    document.getElementById('inp-address').value = place.formatted_address;
+    await checkZoneForPoint(lat, lng);
+  }
+
+  async function checkZoneForPoint(lat, lng) {
+    const badge = document.getElementById('zoneBadge');
+    const badgeText = document.getElementById('zoneBadgeText');
+    detectedZoneId = null;
+
+    const { data, error } = await client.rpc('match_zone_for_point', {
+      lat: lat, lng: lng, agent: currentUser.id
+    });
+
+    if (!error && data && data.length > 0) {
+      const zone = data[0];
+      detectedZoneId = zone.zone_id;
+      badge.className = 'zone-badge found';
+      badgeText.innerHTML = `<strong>${zone.zone_name}</strong> — this address is in your zone`;
+    } else {
+      badge.className = 'zone-badge not-found';
+      badgeText.innerHTML = `Outside your current zones — <a href="zones.html" target="_blank">Create a zone</a> for this area`;
+    }
   }
 
   async function loadZones() {
     const { data } = await client.from('zones').select('id, name, color').eq('agent_id', currentUser.id).order('name');
     allZones = data || [];
-    const select = document.getElementById('inp-zone');
-    select.innerHTML = '<option value="">— Select a zone —</option>';
-    allZones.forEach(z => {
-      const opt = document.createElement('option');
-      opt.value = z.id;
-      opt.textContent = z.name;
-      select.appendChild(opt);
-    });
   }
 
   async function loadSubscribers() {
@@ -314,12 +415,31 @@
     document.getElementById('clientCount').textContent = allSubscribers.filter(s => s.status === 'client').length;
   }
 
+  function sortBy(col) {
+    const thId = 'th-' + col;
+    document.querySelectorAll('th').forEach(th => { th.classList.remove('sort-asc','sort-desc'); });
+    if (sortCol === col) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
+    else { sortCol = col; sortDir = 'asc'; }
+    const th = document.getElementById(thId);
+    if (th) th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+    renderTable();
+  }
+
+  function getSortValue(sub, col) {
+    if (col === 'name') return (sub.first_name + ' ' + sub.last_name).toLowerCase();
+    if (col === 'zone') return sub.zones ? sub.zones.name.toLowerCase() : '';
+    if (col === 'status') { const order = {hot:0,warm:1,cold:2,client:3}; return order[sub.status] ?? 99; }
+    if (col === 'score') return sub.engagement_score || 0;
+    if (col === 'date') return new Date(sub.created_at).getTime();
+    return '';
+  }
+
   function renderTable() {
     const body = document.getElementById('subTableBody');
     const empty = document.getElementById('emptyState');
     body.innerHTML = '';
 
-    let filtered = allSubscribers;
+    let filtered = [...allSubscribers];
     if (activeFilter !== 'all') filtered = filtered.filter(s => s.status === activeFilter);
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -330,22 +450,29 @@
       );
     }
 
+    filtered.sort((a, b) => {
+      const av = getSortValue(a, sortCol);
+      const bv = getSortValue(b, sortCol);
+      if (av < bv) return sortDir === 'asc' ? -1 : 1;
+      if (av > bv) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+
     if (filtered.length === 0) {
       empty.style.display = 'block';
-      document.getElementById('subTable').style.display = allSubscribers.length === 0 ? 'none' : 'table';
       return;
     }
-
     empty.style.display = 'none';
-    document.getElementById('subTable').style.display = 'table';
 
     filtered.forEach(sub => {
-      const initials = (sub.first_name[0] + sub.last_name[0]).toUpperCase();
+      const initials = (sub.first_name[0] + (sub.last_name[0] || '')).toUpperCase();
       const zone = sub.zones;
       const date = new Date(sub.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(sub.email || '')}&su=${encodeURIComponent('Checking in — Front Porch LA')}`;
 
       const row = document.createElement('tr');
+      row.className = 'data-row';
+      row.onclick = () => openProfile(sub.id);
       row.innerHTML = `
         <td>
           <div class="cell-name">
@@ -356,17 +483,14 @@
             </div>
           </div>
         </td>
-        <td>
-          ${zone ? `<div class="cell-zone"><div class="cell-zone-dot" style="background:${zone.color}"></div><div class="cell-zone-name">${zone.name}</div></div>` : '<span style="color:var(--light);font-size:12px;">No zone</span>'}
-        </td>
+        <td>${zone ? `<div class="cell-zone"><div class="cell-zone-dot" style="background:${zone.color}"></div><div class="cell-zone-name">${zone.name}</div></div>` : '<span style="color:var(--light);font-size:12px;">No zone</span>'}</td>
         <td><span class="status-pill status-${sub.status}">${sub.status}</span></td>
         <td><span class="cell-score">${sub.engagement_score}</span></td>
         <td><span style="font-size:12px;color:var(--light);">${date}</span></td>
         <td>
-          <div class="cell-actions">
-            ${sub.email ? `<button class="action-btn primary" onclick="event.stopPropagation();window.open('${gmailUrl}','_blank')">Email</button>` : ''}
-            ${sub.phone ? `<button class="action-btn" onclick="event.stopPropagation();window.location.href='tel:${sub.phone}'">Call</button>` : ''}
-            <button class="action-btn" onclick="event.stopPropagation();deleteSubscriber('${sub.id}')">Remove</button>
+          <div class="cell-actions" onclick="event.stopPropagation()">
+            ${sub.email ? `<button class="action-btn email-btn" onclick="window.open('${gmailUrl}','_blank')">Email</button>` : ''}
+            ${sub.phone ? `<button class="action-btn" onclick="window.location.href='tel:${sub.phone}'">Call</button>` : ''}
           </div>
         </td>
       `;
@@ -381,37 +505,19 @@
     renderTable();
   }
 
-  function filterSearch(val) {
-    searchQuery = val;
-    renderTable();
-  }
+  function filterSearch(val) { searchQuery = val; renderTable(); }
 
   function openAddModal() {
     document.getElementById('addModal').classList.add('open');
-    document.getElementById('inp-first').focus();
+    setTimeout(() => document.getElementById('inp-first').focus(), 100);
   }
 
   function closeAddModal() {
     document.getElementById('addModal').classList.remove('open');
-    ['inp-first','inp-last','inp-email','inp-phone','inp-address','inp-city','inp-zip','inp-notes'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('inp-zone').value = '';
+    ['inp-first','inp-last','inp-email','inp-phone','inp-address','inp-notes'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('inp-status').value = 'cold';
-    document.getElementById('zoneIndicator').className = 'zone-indicator';
-  }
-
-  function lookupZone() {
-    const address = document.getElementById('inp-address').value.trim();
-    const zip = document.getElementById('inp-zip').value.trim();
-    const indicator = document.getElementById('zoneIndicator');
-    if (!zip || zip.length < 5) { indicator.className = 'zone-indicator'; return; }
-    const westside = ['90049','90272','90210','90077','90024','90025','90064','90066','90291','90292','90402'];
-    if (westside.includes(zip)) {
-      indicator.className = 'zone-indicator visible';
-      indicator.textContent = 'This address appears to be in the Westside — select the matching zone below.';
-    } else {
-      indicator.className = 'zone-indicator warning visible';
-      indicator.textContent = 'This address may be outside your current zones. You can still add them and assign a zone manually.';
-    }
+    document.getElementById('zoneBadge').className = 'zone-badge';
+    detectedZoneId = null; detectedLat = null; detectedLng = null;
   }
 
   async function addSubscriber() {
@@ -420,43 +526,124 @@
     if (!first || !last) { showToast('First and last name are required', 'error'); return; }
 
     const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Adding...';
+    btn.disabled = true; btn.textContent = 'Adding...';
 
-    const zoneId = document.getElementById('inp-zone').value || null;
+    const notesVal = document.getElementById('inp-notes').value.trim();
+    const notesHistory = notesVal ? JSON.stringify([{ text: notesVal, date: new Date().toISOString() }]) : null;
+
     const { error } = await client.from('subscribers').insert({
-      first_name: first,
-      last_name: last,
+      first_name: first, last_name: last,
       email: document.getElementById('inp-email').value.trim() || null,
       phone: document.getElementById('inp-phone').value.trim() || null,
       address: document.getElementById('inp-address').value.trim() || null,
-      city: document.getElementById('inp-city').value.trim() || null,
-      zip: document.getElementById('inp-zip').value.trim() || null,
-      zone_id: zoneId,
+      zone_id: detectedZoneId || null,
       status: document.getElementById('inp-status').value,
-      notes: document.getElementById('inp-notes').value.trim() || null,
+      notes: notesHistory,
       agent_id: currentUser.id
     });
 
-    btn.disabled = false;
-    btn.textContent = 'Add subscriber';
-
-    if (error) { showToast('Error adding subscriber — ' + error.message, 'error'); return; }
-
+    btn.disabled = false; btn.textContent = 'Add subscriber';
+    if (error) { showToast('Error — ' + error.message, 'error'); return; }
     showToast(first + ' ' + last + ' added', 'success');
     closeAddModal();
     await loadSubscribers();
   }
 
-  async function deleteSubscriber(id) {
+  function openProfile(id) {
+    const sub = allSubscribers.find(s => s.id === id);
+    if (!sub) return;
+    selectedSubId = id;
+
+    document.getElementById('profileAvatar').textContent = (sub.first_name[0] + (sub.last_name[0]||'')).toUpperCase();
+    document.getElementById('profileName').textContent = sub.first_name + ' ' + sub.last_name;
+    const zone = sub.zones;
+    document.getElementById('profileZone').innerHTML = zone
+      ? `<div style="width:8px;height:8px;border-radius:50%;background:${zone.color};"></div> ${zone.name}`
+      : '<span style="color:var(--light);">No zone assigned</span>';
+
+    document.getElementById('profileEmail').textContent = sub.email || '—';
+    document.getElementById('profilePhone').textContent = sub.phone || '—';
+    document.getElementById('profileAddress').textContent = sub.address || '—';
+
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(sub.email||'')}&su=${encodeURIComponent('Checking in — Front Porch LA')}`;
+    document.getElementById('profileEmailBtn').onclick = () => window.open(gmailUrl, '_blank');
+    document.getElementById('profileCallBtn').onclick = () => { if(sub.phone) window.location.href = 'tel:' + sub.phone; };
+
+    document.querySelectorAll('.status-btn').forEach(btn => {
+      btn.classList.remove('active-status');
+      if (btn.dataset.s === sub.status) btn.classList.add('active-status');
+    });
+
+    document.getElementById('newNoteInput').value = '';
+    renderNoteHistory(sub.notes);
+
+    document.getElementById('profileOverlay').classList.add('open');
+    document.getElementById('profilePanel').classList.add('open');
+  }
+
+  function renderNoteHistory(notesJson) {
+    const container = document.getElementById('noteHistory');
+    container.innerHTML = '';
+    let notes = [];
+    try { notes = notesJson ? JSON.parse(notesJson) : []; } catch(e) { notes = []; }
+    if (notes.length === 0) {
+      container.innerHTML = '<div style="font-size:13px;color:var(--light);font-weight:300;">No notes yet.</div>';
+      return;
+    }
+    [...notes].reverse().forEach(note => {
+      const d = new Date(note.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+      const el = document.createElement('div');
+      el.className = 'note-entry';
+      el.innerHTML = `<div class="note-entry-date">${d}</div><div class="note-entry-text">${note.text}</div>`;
+      container.appendChild(el);
+    });
+  }
+
+  async function saveNote() {
+    const text = document.getElementById('newNoteInput').value.trim();
+    if (!text || !selectedSubId) return;
+    const sub = allSubscribers.find(s => s.id === selectedSubId);
+    let notes = [];
+    try { notes = sub.notes ? JSON.parse(sub.notes) : []; } catch(e) { notes = []; }
+    notes.push({ text, date: new Date().toISOString() });
+    const { error } = await client.from('subscribers').update({ notes: JSON.stringify(notes) }).eq('id', selectedSubId);
+    if (error) { showToast('Error saving note', 'error'); return; }
+    document.getElementById('newNoteInput').value = '';
+    showToast('Note saved', 'success');
+    await loadSubscribers();
+    const updated = allSubscribers.find(s => s.id === selectedSubId);
+    if (updated) renderNoteHistory(updated.notes);
+  }
+
+  async function updateStatus(status) {
+    if (!selectedSubId) return;
+    const { error } = await client.from('subscribers').update({ status }).eq('id', selectedSubId);
+    if (error) { showToast('Error updating status', 'error'); return; }
+    document.querySelectorAll('.status-btn').forEach(btn => {
+      btn.classList.remove('active-status');
+      if (btn.dataset.s === status) btn.classList.add('active-status');
+    });
+    showToast('Status updated', 'success');
+    await loadSubscribers();
+  }
+
+  async function deleteCurrentSubscriber() {
+    if (!selectedSubId) return;
     if (!confirm('Remove this subscriber? This cannot be undone.')) return;
-    const { error } = await client.from('subscribers').delete().eq('id', id);
+    const { error } = await client.from('subscribers').delete().eq('id', selectedSubId);
     if (error) { showToast('Error removing subscriber', 'error'); return; }
+    closeProfile();
     showToast('Subscriber removed');
     await loadSubscribers();
   }
 
-  function showToast(msg, type = '') {
+  function closeProfile() {
+    document.getElementById('profileOverlay').classList.remove('open');
+    document.getElementById('profilePanel').classList.remove('open');
+    selectedSubId = null;
+  }
+
+  function showToast(msg, type='') {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.className = 'toast visible ' + type;
@@ -465,5 +652,7 @@
 
   init();
 </script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAaNEzDIZXk-tSuds24aQljvHSURJ2d2o&libraries=places&callback=initAutocomplete" async defer></script>
 </body>
 </html>
