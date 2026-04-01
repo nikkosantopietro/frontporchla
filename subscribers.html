@@ -25,6 +25,12 @@
   .btn-add { background: var(--terra); color: white; }
   .btn-add:hover { background: #9e5522; }
 
+  /* NO-ZONE WARNING BANNER */
+  .nozone-banner { background: #FEF3DC; border-bottom: 1px solid #FAC775; padding: 12px 40px; display: flex; align-items: center; gap: 10px; }
+  .nozone-banner-icon { font-size: 16px; }
+  .nozone-banner-text { font-size: 13px; color: #854F0B; font-weight: 500; }
+  .nozone-banner-link { font-size: 12px; color: #854F0B; text-decoration: underline; cursor: pointer; margin-left: auto; }
+
   /* PAGE HEADER */
   .page-header { background: var(--warm-white); border-bottom: 1px solid var(--sand); padding: 28px 40px; display: flex; justify-content: space-between; align-items: flex-end; }
   .page-title-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 2.5px; text-transform: uppercase; color: var(--terra); margin-bottom: 6px; }
@@ -70,17 +76,25 @@
   .cell-zone { display: flex; align-items: center; gap: 6px; }
   .cell-zone-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .cell-zone-name { font-size: 12px; color: var(--mid); }
+  .cell-num { font-size: 13px; color: var(--charcoal); font-family: 'Playfair Display', serif; }
+  .cell-num-sub { font-size: 10px; color: var(--light); margin-top: 1px; }
   .status-pill { font-size: 10px; padding: 3px 10px; border-radius: 100px; font-weight: 500; text-transform: capitalize; }
+  .status-onfire { background: #FAE8E8; color: #7a0000; }
   .status-hot { background: #FAE8E8; color: #A32D2D; }
   .status-warm { background: #FEF3DC; color: #854F0B; }
   .status-cold { background: var(--sand); color: var(--mid); }
   .status-client { background: var(--green-light); color: var(--green); }
-  .cell-score { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--charcoal); }
+  .cell-score { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--charcoal); font-weight: 600; }
+  .cell-score.score-onfire { color: #A32D2D; }
+  .cell-score.score-hot { color: var(--terra); }
+  .cell-score.score-warm { color: #854F0B; }
+  .cell-score.score-cold { color: var(--light); }
   .cell-actions { display: flex; gap: 6px; }
   .action-btn { font-size: 11px; padding: 5px 12px; border-radius: 100px; border: 1px solid var(--sand); background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--mid); transition: all 0.2s; white-space: nowrap; }
   .action-btn:hover { border-color: var(--terra); color: var(--terra); }
   .action-btn.email-btn { background: var(--terra); color: white; border-color: var(--terra); }
   .action-btn.email-btn:hover { background: #9e5522; }
+  .nozone-flag { font-size: 10px; background: #FEF3DC; color: #854F0B; padding: 2px 8px; border-radius: 100px; border: 1px solid #FAC775; margin-left: 6px; }
 
   /* EMPTY STATE */
   .empty-state { padding: 60px 40px; text-align: center; }
@@ -102,14 +116,11 @@
   .form-input:focus { border-color: var(--terra); }
   .form-input::placeholder { color: var(--light); }
   .form-select { width: 100%; padding: 11px 14px; background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--charcoal); outline: none; cursor: pointer; }
-
-  /* ZONE BADGE */
   .zone-badge { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; display: none; align-items: center; gap: 8px; font-weight: 500; }
   .zone-badge.found { background: var(--green-light); color: var(--green); border: 1px solid #C0DD97; display: flex; }
   .zone-badge.not-found { background: #FAE8E8; color: #A32D2D; border: 1px solid #F0BABA; display: flex; }
   .zone-badge-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
   .zone-badge a { color: inherit; font-weight: 600; }
-
   .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
   .btn-cancel { flex: 1; padding: 12px; background: none; border: 1px solid var(--sand); border-radius: 100px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--mid); cursor: pointer; }
   .btn-submit { flex: 2; padding: 12px; background: var(--terra); color: white; border: none; border-radius: 100px; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; }
@@ -127,33 +138,37 @@
   .profile-avatar-lg { width: 52px; height: 52px; border-radius: 50%; background: var(--sand); color: var(--mid); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 500; margin-bottom: 12px; }
   .profile-name { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--charcoal); margin-bottom: 4px; }
   .profile-zone { font-size: 12px; color: var(--mid); display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
-  .profile-status-row { display: flex; gap: 8px; align-items: center; }
-  .status-btn { font-size: 11px; padding: 4px 12px; border-radius: 100px; border: 1px solid var(--sand); background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--mid); transition: all 0.2s; }
-  .status-btn.active-status { font-weight: 500; }
-  .status-btn[data-s="hot"].active-status { background: #FAE8E8; color: #A32D2D; border-color: #F0BABA; }
-  .status-btn[data-s="warm"].active-status { background: #FEF3DC; color: #854F0B; border-color: #FAC775; }
-  .status-btn[data-s="cold"].active-status { background: var(--sand); color: var(--mid); border-color: var(--light); }
-  .status-btn[data-s="client"].active-status { background: var(--green-light); color: var(--green); border-color: #C0DD97; }
-
+  .profile-score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .profile-score-num { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--charcoal); }
+  .profile-score-label { font-size: 11px; color: var(--light); text-transform: uppercase; letter-spacing: 1px; }
+  .profile-client-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .profile-client-label { font-size: 12px; color: var(--mid); }
+  .toggle-client { position: relative; width: 36px; height: 20px; }
+  .toggle-client input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; inset: 0; background: var(--sand); border-radius: 20px; cursor: pointer; transition: 0.2s; }
+  .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+  input:checked + .toggle-slider { background: var(--green); }
+  input:checked + .toggle-slider:before { transform: translateX(16px); }
   .profile-body { padding: 20px 24px; flex: 1; }
   .profile-section { margin-bottom: 20px; }
   .profile-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--light); font-weight: 500; margin-bottom: 10px; }
   .profile-detail-row { display: flex; gap: 8px; font-size: 13px; margin-bottom: 6px; }
-  .profile-detail-label { color: var(--light); width: 60px; flex-shrink: 0; }
+  .profile-detail-label { color: var(--light); width: 80px; flex-shrink: 0; }
   .profile-detail-value { color: var(--charcoal); font-weight: 500; }
   .profile-action-row { display: flex; gap: 8px; margin-top: 14px; }
   .profile-action-btn { flex: 1; padding: 9px; border-radius: 100px; border: 1px solid var(--sand); background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--mid); transition: all 0.2s; text-align: center; }
   .profile-action-btn:hover { border-color: var(--terra); color: var(--terra); }
   .profile-action-btn.primary { background: var(--terra); color: white; border-color: var(--terra); }
   .profile-action-btn.primary:hover { background: #9e5522; }
-
-  /* NOTES */
+  .engagement-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+  .engagement-box { background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; padding: 10px 8px; text-align: center; }
+  .engagement-val { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--charcoal); }
+  .engagement-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--light); margin-top: 2px; }
   .notes-area { width: 100%; padding: 11px 14px; background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--charcoal); outline: none; resize: vertical; min-height: 80px; transition: border-color 0.2s; }
   .notes-area:focus { border-color: var(--terra); }
   .notes-area::placeholder { color: var(--light); }
   .btn-save-note { margin-top: 8px; padding: 8px 20px; background: var(--charcoal); color: var(--cream); border: none; border-radius: 100px; font-size: 12px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s; }
   .btn-save-note:hover { background: #444; }
-  .note-history { margin-top: 14px; }
   .note-entry { padding: 10px 12px; background: var(--cream); border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--sand); }
   .note-entry-date { font-size: 10px; color: var(--light); margin-bottom: 4px; }
   .note-entry-text { font-size: 13px; color: var(--charcoal); line-height: 1.5; }
@@ -164,10 +179,7 @@
   .toast.success { background: var(--green); }
   .toast.error { background: #C0392B; }
 
-  /* AUTH CHECK */
   #authCheck { display: none; position: fixed; inset: 0; background: var(--cream); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
-
-  /* Google autocomplete dropdown */
   .pac-container { font-family: 'DM Sans', sans-serif; font-size: 13px; border-radius: 8px; border: 1px solid var(--sand); box-shadow: 0 4px 20px rgba(44,40,37,0.12); margin-top: 2px; }
   .pac-item { padding: 8px 14px; cursor: pointer; }
   .pac-item:hover { background: var(--cream); }
@@ -188,6 +200,13 @@
   </div>
 </nav>
 
+<!-- NO-ZONE WARNING BANNER -->
+<div class="nozone-banner" id="nozoneBanner" style="display:none;">
+  <span class="nozone-banner-icon">⚠️</span>
+  <span class="nozone-banner-text" id="nozoneBannerText">Some subscribers have no zone — they will be skipped on the next send.</span>
+  <span class="nozone-banner-link" onclick="filterStatus(document.querySelector('[data-filter=nozone]'),'nozone')">View affected subscribers →</span>
+</div>
+
 <div class="page-header">
   <div>
     <div class="page-title-eyebrow">Agent portal</div>
@@ -201,11 +220,13 @@
 </div>
 
 <div class="filter-bar">
-  <div class="filter-pill active" onclick="filterStatus(this,'all')">All</div>
-  <div class="filter-pill" onclick="filterStatus(this,'hot')">Hot</div>
-  <div class="filter-pill" onclick="filterStatus(this,'warm')">Warm</div>
-  <div class="filter-pill" onclick="filterStatus(this,'cold')">Cold</div>
-  <div class="filter-pill" onclick="filterStatus(this,'client')">Clients</div>
+  <div class="filter-pill active" data-filter="all" onclick="filterStatus(this,'all')">All</div>
+  <div class="filter-pill" data-filter="onfire" onclick="filterStatus(this,'onfire')">🔥 On Fire</div>
+  <div class="filter-pill" data-filter="hot" onclick="filterStatus(this,'hot')">Hot</div>
+  <div class="filter-pill" data-filter="warm" onclick="filterStatus(this,'warm')">Warm</div>
+  <div class="filter-pill" data-filter="cold" onclick="filterStatus(this,'cold')">Cold</div>
+  <div class="filter-pill" data-filter="client" onclick="filterStatus(this,'client')">Clients</div>
+  <div class="filter-pill" data-filter="nozone" onclick="filterStatus(this,'nozone')">No Zone</div>
   <input class="filter-search" placeholder="Search name, email, address..." oninput="filterSearch(this.value)" />
 </div>
 
@@ -217,9 +238,11 @@
           <tr>
             <th onclick="sortBy('name')" id="th-name">Name <span class="sort-arrow"></span></th>
             <th onclick="sortBy('zone')" id="th-zone">Zone <span class="sort-arrow"></span></th>
-            <th onclick="sortBy('status')" id="th-status">Status <span class="sort-arrow"></span></th>
+            <th onclick="sortBy('emails_sent')" id="th-emails_sent">Emails Sent <span class="sort-arrow"></span></th>
+            <th onclick="sortBy('total_opens')" id="th-total_opens">Total Opens <span class="sort-arrow"></span></th>
+            <th onclick="sortBy('monthly_clicks')" id="th-monthly_clicks">This Mo. Clicks <span class="sort-arrow"></span></th>
             <th onclick="sortBy('score')" id="th-score">Score <span class="sort-arrow"></span></th>
-            <th onclick="sortBy('date')" id="th-date">Added <span class="sort-arrow"></span></th>
+            <th onclick="sortBy('status')" id="th-status">Status <span class="sort-arrow"></span></th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -239,7 +262,6 @@
   <div class="modal">
     <div class="modal-title">Add a <em>subscriber.</em></div>
     <div class="modal-sub">Start typing their address and we'll automatically find which zone they belong to.</div>
-
     <div class="form-row">
       <div class="form-group" style="margin-bottom:0;"><label class="form-label">First name *</label><input class="form-input" id="inp-first" placeholder="Sarah" /></div>
       <div class="form-group" style="margin-bottom:0;"><label class="form-label">Last name *</label><input class="form-input" id="inp-last" placeholder="Reinhart" /></div>
@@ -248,32 +270,18 @@
       <div class="form-group" style="margin-bottom:0;"><label class="form-label">Email</label><input class="form-input" id="inp-email" type="email" placeholder="sarah@email.com" /></div>
       <div class="form-group" style="margin-bottom:0;"><label class="form-label">Phone</label><input class="form-input" id="inp-phone" type="tel" placeholder="310-555-0100" /></div>
     </div>
-
     <div class="form-group">
       <label class="form-label">Home address *</label>
       <input class="form-input" id="inp-address" placeholder="Start typing an address..." autocomplete="off" />
     </div>
-
     <div class="zone-badge" id="zoneBadge">
       <div class="zone-badge-dot"></div>
       <span id="zoneBadgeText"></span>
     </div>
-
-    <div class="form-group">
-      <label class="form-label">Status</label>
-      <select class="form-select" id="inp-status">
-        <option value="cold">Cold</option>
-        <option value="warm">Warm</option>
-        <option value="hot">Hot</option>
-        <option value="client">Client</option>
-      </select>
-    </div>
-
     <div class="form-group">
       <label class="form-label">Notes</label>
       <input class="form-input" id="inp-notes" placeholder="Met at door knock, interested in selling spring 2026" />
     </div>
-
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
       <button class="btn-submit" id="submitBtn" onclick="addSubscriber()">Add subscriber</button>
@@ -285,21 +293,38 @@
 <div class="profile-overlay" id="profileOverlay" onclick="closeProfile()"></div>
 <div class="profile-panel" id="profilePanel">
   <div class="profile-header">
-    <div>
+    <div style="flex:1;">
       <div class="profile-avatar-lg" id="profileAvatar"></div>
       <div class="profile-name" id="profileName"></div>
       <div class="profile-zone" id="profileZone"></div>
-      <div class="profile-status-row">
-        <button class="status-btn" data-s="cold" onclick="updateStatus('cold')">Cold</button>
-        <button class="status-btn" data-s="warm" onclick="updateStatus('warm')">Warm</button>
-        <button class="status-btn" data-s="hot" onclick="updateStatus('hot')">Hot</button>
-        <button class="status-btn" data-s="client" onclick="updateStatus('client')">Client</button>
+      <div class="profile-score-row">
+        <div>
+          <div class="profile-score-num" id="profileScore">0</div>
+          <div class="profile-score-label">Engagement score</div>
+        </div>
+        <div style="margin-left:12px;" id="profileStatusPill"></div>
+      </div>
+      <div class="profile-client-row">
+        <span class="profile-client-label">Mark as client</span>
+        <label class="toggle-client">
+          <input type="checkbox" id="clientToggle" onchange="toggleClient(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
       </div>
     </div>
     <button class="profile-close" onclick="closeProfile()">×</button>
   </div>
 
   <div class="profile-body">
+    <div class="profile-section">
+      <div class="profile-section-label">Engagement</div>
+      <div class="engagement-grid">
+        <div class="engagement-box"><div class="engagement-val" id="profEmailsSent">0</div><div class="engagement-lbl">Sent</div></div>
+        <div class="engagement-box"><div class="engagement-val" id="profTotalOpens">0</div><div class="engagement-lbl">Opens</div></div>
+        <div class="engagement-box"><div class="engagement-val" id="profMonthlyClicks">0</div><div class="engagement-lbl">This Mo. Clicks</div></div>
+      </div>
+    </div>
+
     <div class="profile-section">
       <div class="profile-section-label">Contact</div>
       <div class="profile-detail-row"><span class="profile-detail-label">Email</span><span class="profile-detail-value" id="profileEmail">—</span></div>
@@ -339,13 +364,32 @@
   let allZones = [];
   let activeFilter = 'all';
   let searchQuery = '';
-  let sortCol = 'date';
+  let sortCol = 'score';
   let sortDir = 'desc';
   let selectedSubId = null;
   let detectedZoneId = null;
   let detectedLat = null;
   let detectedLng = null;
   let autocomplete = null;
+
+  // Auto-calculate status from score
+  function calcStatus(sub) {
+    if (sub.status === 'client') return 'client';
+    const score = sub.engagement_score || 0;
+    if (score >= 100) return 'onfire';
+    if (score >= 51) return 'hot';
+    if (score >= 21) return 'warm';
+    return 'cold';
+  }
+
+  function statusLabel(status) {
+    if (status === 'onfire') return '🔥 On Fire';
+    if (status === 'hot') return 'Hot';
+    if (status === 'warm') return 'Warm';
+    if (status === 'cold') return 'Cold';
+    if (status === 'client') return 'Client';
+    return status;
+  }
 
   async function init() {
     const { data: { session } } = await client.auth.getSession();
@@ -381,18 +425,14 @@
     const badge = document.getElementById('zoneBadge');
     const badgeText = document.getElementById('zoneBadgeText');
     detectedZoneId = null;
-
-    const { data, error } = await client.rpc('match_zone_for_point', {
-      lat: lat, lng: lng, agent: currentUser.id
-    });
-
+    const { data, error } = await client.rpc('match_zone_for_point', { lat, lng, agent: currentUser.id });
     if (!error && data && data.length > 0) {
       const zone = data[0];
       detectedZoneId = zone.zone_id;
       badge.className = 'zone-badge found';
       badgeText.innerHTML = `<strong>${zone.zone_name}</strong> — this address is in your zone`;
     } else {
-     badge.className = 'zone-badge not-found';
+      badge.className = 'zone-badge not-found';
       const addrEncoded = encodeURIComponent(document.getElementById('inp-address').value);
       badgeText.innerHTML = `Outside your current zones — <a href="zones.html?lat=${lat}&lng=${lng}&address=${addrEncoded}" target="_blank">Create a zone</a> for this area`;
     }
@@ -404,24 +444,36 @@
   }
 
   async function loadSubscribers() {
-    const { data } = await client.from('subscribers').select('*, zones(name, color)').eq('agent_id', currentUser.id).order('created_at', { ascending: false });
+    const { data } = await client.from('subscribers').select('*, zones(name, color)').eq('agent_id', currentUser.id).order('engagement_score', { ascending: false });
     allSubscribers = data || [];
     renderTable();
     updateCounts();
+    checkNoZoneBanner();
   }
 
   function updateCounts() {
     document.getElementById('totalCount').textContent = allSubscribers.length;
-    document.getElementById('hotCount').textContent = allSubscribers.filter(s => s.status === 'hot').length;
+    document.getElementById('hotCount').textContent = allSubscribers.filter(s => { const st = calcStatus(s); return st === 'hot' || st === 'onfire'; }).length;
     document.getElementById('clientCount').textContent = allSubscribers.filter(s => s.status === 'client').length;
   }
 
+  function checkNoZoneBanner() {
+    const unzoned = allSubscribers.filter(s => !s.zone_id);
+    const banner = document.getElementById('nozoneBanner');
+    if (unzoned.length > 0) {
+      banner.style.display = 'flex';
+      document.getElementById('nozoneBannerText').textContent =
+        `${unzoned.length} subscriber${unzoned.length > 1 ? 's have' : ' has'} no zone — they will be skipped on the next send.`;
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
   function sortBy(col) {
-    const thId = 'th-' + col;
-    document.querySelectorAll('th').forEach(th => { th.classList.remove('sort-asc','sort-desc'); });
+    document.querySelectorAll('th').forEach(th => th.classList.remove('sort-asc','sort-desc'));
     if (sortCol === col) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
-    else { sortCol = col; sortDir = 'asc'; }
-    const th = document.getElementById(thId);
+    else { sortCol = col; sortDir = 'desc'; }
+    const th = document.getElementById('th-' + col);
     if (th) th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
     renderTable();
   }
@@ -429,8 +481,11 @@
   function getSortValue(sub, col) {
     if (col === 'name') return (sub.first_name + ' ' + sub.last_name).toLowerCase();
     if (col === 'zone') return sub.zones ? sub.zones.name.toLowerCase() : '';
-    if (col === 'status') { const order = {hot:0,warm:1,cold:2,client:3}; return order[sub.status] ?? 99; }
+    if (col === 'status') { const order = {onfire:0,hot:1,warm:2,cold:3,client:4}; return order[calcStatus(sub)] ?? 99; }
     if (col === 'score') return sub.engagement_score || 0;
+    if (col === 'emails_sent') return sub.emails_sent || 0;
+    if (col === 'total_opens') return sub.total_opens || 0;
+    if (col === 'monthly_clicks') return sub.monthly_clicks || 0;
     if (col === 'date') return new Date(sub.created_at).getTime();
     return '';
   }
@@ -441,7 +496,11 @@
     body.innerHTML = '';
 
     let filtered = [...allSubscribers];
-    if (activeFilter !== 'all') filtered = filtered.filter(s => s.status === activeFilter);
+    if (activeFilter === 'nozone') {
+      filtered = filtered.filter(s => !s.zone_id);
+    } else if (activeFilter !== 'all') {
+      filtered = filtered.filter(s => calcStatus(s) === activeFilter);
+    }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       filtered = filtered.filter(s =>
@@ -450,7 +509,6 @@
         (s.address || '').toLowerCase().includes(q)
       );
     }
-
     filtered.sort((a, b) => {
       const av = getSortValue(a, sortCol);
       const bv = getSortValue(b, sortCol);
@@ -459,17 +517,17 @@
       return 0;
     });
 
-    if (filtered.length === 0) {
-      empty.style.display = 'block';
-      return;
-    }
+    if (filtered.length === 0) { empty.style.display = 'block'; return; }
     empty.style.display = 'none';
 
     filtered.forEach(sub => {
       const initials = (sub.first_name[0] + (sub.last_name[0] || '')).toUpperCase();
       const zone = sub.zones;
-      const date = new Date(sub.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const status = calcStatus(sub);
+      const score = sub.engagement_score || 0;
+      const scoreClass = status === 'onfire' ? 'score-onfire' : status === 'hot' ? 'score-hot' : status === 'warm' ? 'score-warm' : 'score-cold';
       const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(sub.email || '')}&su=${encodeURIComponent('Checking in — Front Porch LA')}`;
+      const nozoneFlag = !sub.zone_id ? '<span class="nozone-flag">No zone</span>' : '';
 
       const row = document.createElement('tr');
       row.className = 'data-row';
@@ -479,15 +537,17 @@
           <div class="cell-name">
             <div class="cell-avatar">${initials}</div>
             <div>
-              <div class="cell-name-text">${sub.first_name} ${sub.last_name}</div>
+              <div class="cell-name-text">${sub.first_name} ${sub.last_name}${nozoneFlag}</div>
               <div class="cell-sub">${sub.address || sub.email || '—'}</div>
             </div>
           </div>
         </td>
-        <td>${zone ? `<div class="cell-zone"><div class="cell-zone-dot" style="background:${zone.color}"></div><div class="cell-zone-name">${zone.name}</div></div>` : '<span style="color:var(--light);font-size:12px;">No zone</span>'}</td>
-        <td><span class="status-pill status-${sub.status}">${sub.status}</span></td>
-        <td><span class="cell-score">${sub.engagement_score}</span></td>
-        <td><span style="font-size:12px;color:var(--light);">${date}</span></td>
+        <td>${zone ? `<div class="cell-zone"><div class="cell-zone-dot" style="background:${zone.color}"></div><div class="cell-zone-name">${zone.name}</div></div>` : '<span style="color:var(--light);font-size:12px;">—</span>'}</td>
+        <td><div class="cell-num">${sub.emails_sent || 0}</div></td>
+        <td><div class="cell-num">${sub.total_opens || 0}</div></td>
+        <td><div class="cell-num">${sub.monthly_clicks || 0}</div></td>
+        <td><span class="cell-score ${scoreClass}">${score}</span></td>
+        <td><span class="status-pill status-${status}">${statusLabel(status)}</span></td>
         <td>
           <div class="cell-actions" onclick="event.stopPropagation()">
             ${sub.email ? `<button class="action-btn email-btn" onclick="window.open('${gmailUrl}','_blank')">Email</button>` : ''}
@@ -516,7 +576,6 @@
   function closeAddModal() {
     document.getElementById('addModal').classList.remove('open');
     ['inp-first','inp-last','inp-email','inp-phone','inp-address','inp-notes'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('inp-status').value = 'cold';
     document.getElementById('zoneBadge').className = 'zone-badge';
     detectedZoneId = null; detectedLat = null; detectedLng = null;
   }
@@ -525,24 +584,24 @@
     const first = document.getElementById('inp-first').value.trim();
     const last = document.getElementById('inp-last').value.trim();
     if (!first || !last) { showToast('First and last name are required', 'error'); return; }
-
     const btn = document.getElementById('submitBtn');
     btn.disabled = true; btn.textContent = 'Adding...';
-
     const notesVal = document.getElementById('inp-notes').value.trim();
     const notesHistory = notesVal ? JSON.stringify([{ text: notesVal, date: new Date().toISOString() }]) : null;
-
     const { error } = await client.from('subscribers').insert({
       first_name: first, last_name: last,
       email: document.getElementById('inp-email').value.trim() || null,
       phone: document.getElementById('inp-phone').value.trim() || null,
       address: document.getElementById('inp-address').value.trim() || null,
       zone_id: detectedZoneId || null,
-      status: document.getElementById('inp-status').value,
+      status: 'cold',
+      engagement_score: 0,
+      emails_sent: 0,
+      total_opens: 0,
+      monthly_clicks: 0,
       notes: notesHistory,
       agent_id: currentUser.id
     });
-
     btn.disabled = false; btn.textContent = 'Add subscriber';
     if (error) { showToast('Error — ' + error.message, 'error'); return; }
     showToast(first + ' ' + last + ' added', 'success');
@@ -554,6 +613,8 @@
     const sub = allSubscribers.find(s => s.id === id);
     if (!sub) return;
     selectedSubId = id;
+    const status = calcStatus(sub);
+    const score = sub.engagement_score || 0;
 
     document.getElementById('profileAvatar').textContent = (sub.first_name[0] + (sub.last_name[0]||'')).toUpperCase();
     document.getElementById('profileName').textContent = sub.first_name + ' ' + sub.last_name;
@@ -562,24 +623,42 @@
       ? `<div style="width:8px;height:8px;border-radius:50%;background:${zone.color};"></div> ${zone.name}`
       : '<span style="color:var(--light);">No zone assigned</span>';
 
+    document.getElementById('profileScore').textContent = score;
+    document.getElementById('profileStatusPill').innerHTML = `<span class="status-pill status-${status}">${statusLabel(status)}</span>`;
+
+    document.getElementById('profEmailsSent').textContent = sub.emails_sent || 0;
+    document.getElementById('profTotalOpens').textContent = sub.total_opens || 0;
+    document.getElementById('profMonthlyClicks').textContent = sub.monthly_clicks || 0;
+
     document.getElementById('profileEmail').textContent = sub.email || '—';
     document.getElementById('profilePhone').textContent = sub.phone || '—';
     document.getElementById('profileAddress').textContent = sub.address || '—';
 
+    document.getElementById('clientToggle').checked = sub.status === 'client';
+
     const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(sub.email||'')}&su=${encodeURIComponent('Checking in — Front Porch LA')}`;
     document.getElementById('profileEmailBtn').onclick = () => window.open(gmailUrl, '_blank');
     document.getElementById('profileCallBtn').onclick = () => { if(sub.phone) window.location.href = 'tel:' + sub.phone; };
-
-    document.querySelectorAll('.status-btn').forEach(btn => {
-      btn.classList.remove('active-status');
-      if (btn.dataset.s === sub.status) btn.classList.add('active-status');
-    });
 
     document.getElementById('newNoteInput').value = '';
     renderNoteHistory(sub.notes);
 
     document.getElementById('profileOverlay').classList.add('open');
     document.getElementById('profilePanel').classList.add('open');
+  }
+
+  async function toggleClient(isClient) {
+    if (!selectedSubId) return;
+    const newStatus = isClient ? 'client' : 'cold';
+    const { error } = await client.from('subscribers').update({ status: newStatus }).eq('id', selectedSubId);
+    if (error) { showToast('Error updating status', 'error'); return; }
+    showToast(isClient ? 'Marked as client' : 'Removed client status', 'success');
+    await loadSubscribers();
+    const updated = allSubscribers.find(s => s.id === selectedSubId);
+    if (updated) {
+      const status = calcStatus(updated);
+      document.getElementById('profileStatusPill').innerHTML = `<span class="status-pill status-${status}">${statusLabel(status)}</span>`;
+    }
   }
 
   function renderNoteHistory(notesJson) {
@@ -614,18 +693,6 @@
     await loadSubscribers();
     const updated = allSubscribers.find(s => s.id === selectedSubId);
     if (updated) renderNoteHistory(updated.notes);
-  }
-
-  async function updateStatus(status) {
-    if (!selectedSubId) return;
-    const { error } = await client.from('subscribers').update({ status }).eq('id', selectedSubId);
-    if (error) { showToast('Error updating status', 'error'); return; }
-    document.querySelectorAll('.status-btn').forEach(btn => {
-      btn.classList.remove('active-status');
-      if (btn.dataset.s === status) btn.classList.add('active-status');
-    });
-    showToast('Status updated', 'success');
-    await loadSubscribers();
   }
 
   async function deleteCurrentSubscriber() {
