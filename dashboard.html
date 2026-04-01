@@ -210,13 +210,13 @@
         </div>
         <div class="status-row">
           <div class="status-left">
-            <div class="status-dot dot-amber"></div>
+            <div class="status-dot dot-green"></div>
             <div>
               <div class="status-name">Email engine</div>
-              <div class="status-detail">SendGrid — not yet configured</div>
+              <div class="status-detail">SendGrid — monthly@frontporchla.com</div>
             </div>
           </div>
-          <div class="status-time">Pending</div>
+          <div class="status-time">Live</div>
         </div>
       </div>
     </div>
@@ -248,6 +248,28 @@
       <div class="empty-state-title">No zones drawn yet</div>
       <div class="empty-state-sub">Your hand-drawn Westside value zones will appear here. Each zone becomes a monthly market report for your subscribers.</div>
       <button class="btn-add">Draw your first zone</button>
+    </div>
+  </div>
+
+  <!-- TEST SEND -->
+  <div class="section-header" style="margin-top:8px;">
+    <div class="section-title">Send test email</div>
+  </div>
+  <div class="status-card" style="margin-bottom:24px;">
+    <div style="padding:8px 0 20px;">
+      <div style="font-size:13px;color:var(--mid);margin-bottom:20px;font-weight:300;">Fire a test email to yourself to preview the monthly report template.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--light);display:block;margin-bottom:6px;">Send to</label>
+          <input id="testTo" type="email" placeholder="your@email.com" style="width:100%;padding:10px 14px;border:1px solid var(--sand);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--cream);color:var(--charcoal);">
+        </div>
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--light);display:block;margin-bottom:6px;">Zone name</label>
+          <input id="testZone" type="text" placeholder="e.g. Brentwood Glen" style="width:100%;padding:10px 14px;border:1px solid var(--sand);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--cream);color:var(--charcoal);">
+        </div>
+      </div>
+      <button onclick="sendTestEmail()" class="btn-add" id="testBtn">Send test email →</button>
+      <span id="testStatus" style="font-size:12px;color:var(--mid);margin-left:14px;"></span>
     </div>
   </div>
 
@@ -291,6 +313,77 @@
   async function signOut() {
     await client.auth.signOut();
     window.location.href = 'login.html';
+  }
+
+  async function sendTestEmail() {
+    const to = document.getElementById('testTo').value;
+    const zone = document.getElementById('testZone').value;
+    const btn = document.getElementById('testBtn');
+    const status = document.getElementById('testStatus');
+
+    if (!to || !zone) {
+      status.textContent = 'Please fill in both fields.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    status.textContent = '';
+
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to,
+          replyTo: 'nikkosantopietro@gmail.com',
+          agentName: 'Nikko Santopietro',
+          agentInitials: 'NS',
+          brokerage: 'The Agency Beverly Hills',
+          zoneName: zone,
+          month: 'April',
+          year: '2026',
+          medianPrice: '$2.4M',
+          medianPriceChange: '↑ 3.2% vs last mo.',
+          pricePerSqFt: '$1,180',
+          pricePerSqFtChange: '↑ 1.8%',
+          saleToList: '101%',
+          homesSold: '7',
+          homesSoldChange: '↑ 2 vs last mo.',
+          daysOnMarket: '14',
+          daysOnMarketChange: '↓ 2 days faster',
+          activeListings: '3',
+          activeListingsChange: '↓ 1 vs last mo.',
+          marketStatus: "Seller's Market",
+          address: '123 Elm St',
+          avmEstimate: '$2,185,000',
+          avmLow: '$2,050,000',
+          avmHigh: '$2,320,000',
+          avmChange: '↑ $42,000',
+          articleTitle: 'Brentwood Glen in Spring: What the Locals Are Saying',
+          articleBody: 'Residents have been buzzing about the newly renovated Brentwood Country Mart, with a handful of new restaurant openings drawing weekend crowds. On Nextdoor, the conversation has shifted toward traffic calming on Bundy — a petition that has already gathered over 200 signatures from Glen homeowners.',
+          listingsUrl: 'https://frontporchla.com',
+          homeValueUrl: 'https://frontporchla.com/home-value.html',
+          contactUrl: 'mailto:nikkosantopietro@gmail.com',
+          unsubscribeUrl: 'https://frontporchla.com',
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        status.style.color = '#3D5A47';
+        status.textContent = '✓ Email sent — check your inbox.';
+      } else {
+        status.style.color = '#A32D2D';
+        status.textContent = 'Error: ' + data.error;
+      }
+    } catch (err) {
+      status.style.color = '#A32D2D';
+      status.textContent = 'Something went wrong.';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Send test email →';
   }
 
   init();
