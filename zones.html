@@ -352,9 +352,43 @@
       }
     });
 
-    renderZonesOnMap();
-    init();
+   renderZonesOnMap();
+  init();
+  checkForAddressPin();
   }
+  function checkForAddressPin() {
+  const params = new URLSearchParams(window.location.search);
+  const lat = parseFloat(params.get('lat'));
+  const lng = parseFloat(params.get('lng'));
+  const address = params.get('address');
+  if (!lat || !lng) return;
+
+  map.setCenter({ lat, lng });
+  map.setZoom(15);
+
+  const marker = new google.maps.Marker({
+    position: { lat, lng },
+    map: map,
+    title: address || 'New subscriber',
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 10,
+      fillColor: '#B5652A',
+      fillOpacity: 1,
+      strokeColor: '#FDFAF7',
+      strokeWeight: 2.5
+    }
+  });
+
+  const infoWindow = new google.maps.InfoWindow({
+    content: `<div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#2C2825;padding:4px 8px;">${decodeURIComponent(address || 'New subscriber')}<br><span style="font-size:11px;color:#9B9088;font-weight:300;">Draw a zone around this address</span></div>`
+  });
+
+  infoWindow.open(map, marker);
+  marker.addListener('click', () => infoWindow.open(map, marker));
+
+  document.getElementById('zoneName').focus();
+}
 </script>
 
 <script async defer
