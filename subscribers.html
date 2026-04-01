@@ -184,7 +184,8 @@
     <div class="page-title-eyebrow">Agent portal</div>
     <h1 class="page-title">Your <em>subscribers.</em></h1>
   </div>
-  <div class="header-stats">
+  <div style="display:flex;align-items:center;gap:28px;">
+    <input id="searchInput" placeholder="Search name, email, address..." oninput="searchQuery=this.value;nozoneOnly=false;renderTable();" style="padding:8px 14px;background:var(--cream);border:1px solid var(--sand);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--charcoal);outline:none;width:240px;" onfocus="this.style.borderColor='var(--terra)'" onblur="this.style.borderColor='var(--sand)'" />
     <div class="header-stat"><div class="header-stat-num" id="totalCount">0</div><div class="header-stat-label">Total</div></div>
     <div class="header-stat"><div class="header-stat-num" id="hotCount" style="color:var(--terra);">0</div><div class="header-stat-label">Hot &amp; On Fire</div></div>
   </div>
