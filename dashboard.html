@@ -282,7 +282,7 @@
   const { createClient } = supabase;
   const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const authCheck = document.getElementById('authCheck');
+ const authCheck = document.getElementById('authCheck');
   authCheck.style.display = 'flex';
 
   async function init() {
@@ -295,6 +295,7 @@
     authCheck.style.display = 'none';
 
     const email = session.user.email;
+    const userId = session.user.id;
     document.getElementById('userEmail').textContent = email;
 
     const firstName = email.split('@')[0];
@@ -308,6 +309,96 @@
     const firstOfNext = new Date(now.getFullYear(), now.getMonth() + 1, 1);
     const sendOptions = { month: 'long', day: 'numeric' };
     document.getElementById('nextSend').textContent = firstOfNext.toLocaleDateString('en-US', sendOptions);
+
+    await loadStats(userId);
+    await loadHotList(userId);
+    await loadZones(userId);
+  }
+
+  async function loadStats(userId) {
+    const { data: subs } = await client
+      .from('subscribers')
+      .select('engagement_score')
+      .eq('agent_id', userId);
+
+    const { data: zones } = await client
+      .from('zones')
+      .select('id')
+      .eq('agent_id', userId);
+
+    const total = subs ? subs.length : 0;
+    const hot = subs ? subs.filter(s => (s.engagement_score || 0) >= 51).length : 0;
+    const activeZones = zones ? zones.length : 0;
+
+    document.querySelector('.stats-row .stat-card:nth-child(1) .stat-card-value').textContent = total;
+    document.querySelector('.stats-row .stat-card:nth-child(2) .stat-card-value').textContent = hot;
+    document.querySelector('.stats-row .stat-card:nth-child(3) .stat-card-value').textContent = activeZones;
+  }
+
+  async function loadHotList(userId) {
+    const { data: subs } = await client
+      .from('subscribers')
+      .select('*, zones(name, color)')
+      .eq('agent_id', userId)
+      .gte('engagement_score', 21)
+      .order('engagement_score', { ascending: false })
+      .limit(5);
+
+    const container = document.querySelector('.hotlist-card');
+    if (!subs || subs.length === 0) {
+      container.innerHTML = `<div style="padding:40px;text-align:center;">
+        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--mid);margin-bottom:8px;">No warm leads yet</div>
+        <div style="font-size:13px;color:var(--light);font-weight:300;">Add subscribers to start tracking engagement.</div>
+      </div>`;
+      return;
+    }
+
+    container.innerHTML = subs.map(sub => {
+      const score = sub.engagement_score || 0;
+      const status = score >= 100 ? 'onfire' : score >= 51 ? 'hot' : 'warm';
+      const statusLabel = status === 'onfire' ? '🔥 On Fire' : status === 'hot' ? 'Hot' : 'Warm';
+      const pillClass = status === 'onfire' || status === 'hot' ? 'pill-hot' : 'pill-warm';
+      const initials = (sub.first_name[0] + (sub.last_name[0] || '')).toUpperCase();
+      const avatarClass = status === 'onfire' || status === 'hot' ? 'av-red' : 'av-amber';
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(sub.email || '')}&su=${encodeURIComponent('Checking in — Front Porch LA')}`;
+
+      return `<div class="hotlist-row">
+        <div class="hotlist-avatar ${avatarClass}">${initials}</div>
+        <div class="hotlist-info">
+          <div class="hotlist-name">${sub.first_name} ${sub.last_name}</div>
+          <div class="hotlist-detail">${sub.zones ? sub.zones.name : 'No zone'} &nbsp;·&nbsp; Score: ${score}</div>
+        </div>
+        <span class="hotlist-pill ${pillClass}">${statusLabel}</span>
+        <div class="hotlist-score">${score}</div>
+        ${sub.email ? `<button class="btn-email" onclick="window.open('${gmailUrl}','_blank')">Email</button>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  async function loadZones(userId) {
+    const { data: zones } = await client
+      .from('zones')
+      .select('id, name, created_at')
+      .eq('agent_id', userId)
+      .order('created_at', { ascending: false });
+
+    const grid = document.querySelector('.zones-grid');
+    if (!zones || zones.length === 0) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+        <div class="empty-state-title">No zones drawn yet</div>
+        <div class="empty-state-sub">Your hand-drawn Westside value zones will appear here.</div>
+        <button class="btn-add" onclick="window.location.href='zones.html'">Draw your first zone</button>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = zones.map(zone => `
+      <div class="zone-card" onclick="window.location.href='zones.html'">
+        <div class="zone-name">${zone.name}</div>
+        <div class="zone-subs">Click to edit zone</div>
+        <span class="zone-badge badge-active">Active</span>
+      </div>
+    `).join('');
   }
 
   async function signOut() {
