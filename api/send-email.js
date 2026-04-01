@@ -1,27 +1,30 @@
 const sgMail = require('@sendgrid/mail');
+const generateEmail = require('./email-template');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { to, subject, html, replyTo } = req.body;
+  const { replyTo, subject, ...templateData } = req.body;
 
-  if (!to || !subject || !html) {
-    return res.status(400).json({ error: 'Missing required fields: to, subject, html' });
+  if (!replyTo || !templateData.agentName || !templateData.zoneName) {
+    return res.status(400).json({ error: 'Missing required fields' });
   }
 
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+  const html = generateEmail(templateData);
+
   try {
     await sgMail.send({
-      to,
+      to: templateData.to,
       from: {
         email: 'monthly@frontporchla.com',
         name: 'Front Porch LA',
       },
-      replyTo: replyTo || 'monthly@frontporchla.com',
-      subject,
+      replyTo: replyTo,
+      subject: subject || `Your ${templateData.month} Neighborhood Report · ${templateData.zoneName}`,
       html,
     });
 
