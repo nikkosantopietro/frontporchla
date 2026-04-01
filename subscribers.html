@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscribers — Front Porch LA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF7; --sand: #E8DDD0;
+    --clay: #C4A882; --terra: #B5652A; --charcoal: #2C2825;
+    --mid: #6B6058; --light: #9B9088; --green: #3D5A47; --green-light: #EBF0EC;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; }
+
+  /* NAV */
+  nav { background: var(--charcoal); padding: 14px 40px; display: flex; justify-content: space-between; align-items: center; }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--cream); text-decoration: none; }
+  .nav-logo span { color: var(--clay); font-style: italic; }
+  .nav-right { display: flex; gap: 10px; align-items: center; }
+  .btn-nav { font-size: 12px; padding: 7px 16px; border-radius: 100px; cursor: pointer; font-family: 'DM Sans', sans-serif; border: none; transition: all 0.2s; }
+  .btn-back { background: none; color: var(--light); border: 1px solid rgba(255,255,255,0.15); }
+  .btn-back:hover { color: var(--cream); }
+  .btn-add { background: var(--terra); color: white; }
+  .btn-add:hover { background: #9e5522; }
+
+  /* PAGE HEADER */
+  .page-header { background: var(--warm-white); border-bottom: 1px solid var(--sand); padding: 28px 40px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .page-title-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 2.5px; text-transform: uppercase; color: var(--terra); margin-bottom: 6px; }
+  .page-title { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--charcoal); letter-spacing: -0.5px; }
+  .page-title em { font-style: italic; color: var(--terra); }
+  .header-stats { display: flex; gap: 32px; }
+  .header-stat { text-align: right; }
+  .header-stat-num { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--charcoal); }
+  .header-stat-label { font-size: 11px; color: var(--light); text-transform: uppercase; letter-spacing: 0.8px; }
+
+  /* FILTER BAR */
+  .filter-bar { background: var(--warm-white); border-bottom: 1px solid var(--sand); padding: 12px 40px; display: flex; gap: 8px; align-items: center; }
+  .filter-pill { font-size: 12px; padding: 6px 16px; border-radius: 100px; border: 1px solid var(--sand); background: var(--cream); color: var(--mid); cursor: pointer; transition: all 0.2s; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+  .filter-pill:hover { border-color: var(--terra); color: var(--terra); }
+  .filter-pill.active { background: var(--terra); color: white; border-color: var(--terra); }
+  .filter-search { margin-left: auto; padding: 7px 14px; background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--charcoal); outline: none; width: 220px; }
+  .filter-search:focus { border-color: var(--terra); }
+  .filter-search::placeholder { color: var(--light); }
+
+  /* MAIN */
+  main { padding: 32px 40px; }
+
+  /* TABLE */
+  .table-card { background: var(--warm-white); border: 1px solid var(--sand); border-radius: 16px; overflow: hidden; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--cream); }
+  th { padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--light); font-weight: 500; border-bottom: 1px solid var(--sand); white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid var(--sand); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--cream); }
+  tr { cursor: pointer; transition: background 0.15s; }
+
+  /* TABLE CELLS */
+  .cell-name { display: flex; align-items: center; gap: 10px; }
+  .cell-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; background: var(--sand); color: var(--mid); }
+  .cell-name-text { font-size: 13px; font-weight: 500; color: var(--charcoal); }
+  .cell-sub { font-size: 11px; color: var(--light); margin-top: 1px; }
+  .cell-zone { display: flex; align-items: center; gap: 6px; }
+  .cell-zone-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cell-zone-name { font-size: 12px; color: var(--mid); }
+  .status-pill { font-size: 10px; padding: 3px 10px; border-radius: 100px; font-weight: 500; }
+  .status-hot { background: #FAE8E8; color: #A32D2D; }
+  .status-warm { background: #FEF3DC; color: #854F0B; }
+  .status-cold { background: var(--sand); color: var(--mid); }
+  .status-client { background: var(--green-light); color: var(--green); }
+  .cell-score { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--charcoal); }
+  .cell-actions { display: flex; gap: 6px; }
+  .action-btn { font-size: 11px; padding: 5px 12px; border-radius: 100px; border: 1px solid var(--sand); background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--mid); transition: all 0.2s; white-space: nowrap; }
+  .action-btn:hover { border-color: var(--terra); color: var(--terra); }
+  .action-btn.primary { background: var(--terra); color: white; border-color: var(--terra); }
+  .action-btn.primary:hover { background: #9e5522; }
+
+  /* EMPTY STATE */
+  .empty-state { padding: 60px 40px; text-align: center; }
+  .empty-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--mid); margin-bottom: 10px; }
+  .empty-sub { font-size: 14px; color: var(--light); margin-bottom: 24px; font-weight: 300; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+  .btn-empty { background: var(--terra); color: white; padding: 12px 28px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  /* MODAL OVERLAY */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,40,37,0.5); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--warm-white); border-radius: 20px; padding: 40px; width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(44,40,37,0.2); max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--charcoal); margin-bottom: 6px; }
+  .modal-title em { font-style: italic; color: var(--terra); }
+  .modal-sub { font-size: 13px; color: var(--light); margin-bottom: 28px; font-weight: 300; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--mid); margin-bottom: 6px; font-weight: 500; }
+  .form-input { width: 100%; padding: 11px 14px; background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--charcoal); outline: none; transition: border-color 0.2s; }
+  .form-input:focus { border-color: var(--terra); }
+  .form-input::placeholder { color: var(--light); }
+  .form-select { width: 100%; padding: 11px 14px; background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--charcoal); outline: none; cursor: pointer; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+  .btn-cancel { flex: 1; padding: 12px; background: none; border: 1px solid var(--sand); border-radius: 100px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--mid); cursor: pointer; }
+  .btn-submit { flex: 2; padding: 12px; background: var(--terra); color: white; border: none; border-radius: 100px; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+  .btn-submit:hover { background: #9e5522; }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* ZONE INDICATOR */
+  .zone-indicator { padding: 12px 14px; background: var(--green-light); border: 1px solid #C0DD97; border-radius: 8px; font-size: 13px; color: var(--green); margin-bottom: 14px; display: none; }
+  .zone-indicator.warning { background: #FEF3DC; border-color: #FAC775; color: #854F0B; }
+  .zone-indicator.visible { display: block; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--charcoal); color: var(--cream); padding: 12px 24px; border-radius: 100px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.visible { opacity: 1; }
+  .toast.success { background: var(--green); }
+  .toast.error { background: #C0392B; }
+
+  /* AUTH CHECK */
+  #authCheck { display: none; position: fixed; inset: 0; background: var(--cream); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+</style>
+</head>
+<body>
+
+<div id="authCheck" style="display:flex;">
+  <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--charcoal)">front porch <span style="color:var(--terra);font-style:italic">la</span></div>
+  <p style="font-size:15px;color:var(--mid);">Checking your session...</p>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">front porch <span>la</span></a>
+  <div class="nav-right">
+    <button class="btn-nav btn-back" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+    <button class="btn-nav btn-add" onclick="openAddModal()">+ Add subscriber</button>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div>
+    <div class="page-title-eyebrow">Agent portal</div>
+    <h1 class="page-title">Your <em>subscribers.</em></h1>
+  </div>
+  <div class="header-stats">
+    <div class="header-stat">
+      <div class="header-stat-num" id="totalCount">0</div>
+      <div class="header-stat-label">Total</div>
+    </div>
+    <div class="header-stat">
+      <div class="header-stat-num" id="hotCount" style="color:var(--terra);">0</div>
+      <div class="header-stat-label">Hot</div>
+    </div>
+    <div class="header-stat">
+      <div class="header-stat-num" id="clientCount" style="color:var(--green);">0</div>
+      <div class="header-stat-label">Clients</div>
+    </div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <div class="filter-pill active" onclick="filterStatus(this, 'all')">All</div>
+  <div class="filter-pill" onclick="filterStatus(this, 'hot')">Hot</div>
+  <div class="filter-pill" onclick="filterStatus(this, 'warm')">Warm</div>
+  <div class="filter-pill" onclick="filterStatus(this, 'cold')">Cold</div>
+  <div class="filter-pill" onclick="filterStatus(this, 'client')">Clients</div>
+  <input class="filter-search" placeholder="Search by name, email, address..." oninput="filterSearch(this.value)" />
+</div>
+
+<main>
+  <div class="table-card">
+    <div class="table-wrap">
+      <table id="subTable">
+        <thead>
+          <tr>
+            <th>Subscriber</th>
+            <th>Zone</th>
+            <th>Status</th>
+            <th>Score</th>
+            <th>Added</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="subTableBody">
+        </tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <div class="empty-title">No subscribers yet</div>
+        <div class="empty-sub">Add your first subscriber to start tracking engagement and building your hot list.</div>
+        <button class="btn-empty" onclick="openAddModal()">+ Add your first subscriber</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ADD SUBSCRIBER MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title">Add a <em>subscriber.</em></div>
+    <div class="modal-sub">Enter their details and we'll auto-assign them to the right zone based on their address.</div>
+
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">First name *</label>
+        <input class="form-input" id="inp-first" placeholder="Sarah" />
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Last name *</label>
+        <input class="form-input" id="inp-last" placeholder="Reinhart" />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="inp-email" type="email" placeholder="sarah@email.com" />
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Phone</label>
+        <input class="form-input" id="inp-phone" type="tel" placeholder="310-555-0100" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Home address *</label>
+      <input class="form-input" id="inp-address" placeholder="324 Amalfi Drive" oninput="lookupZone()" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">City</label>
+        <input class="form-input" id="inp-city" placeholder="Los Angeles" />
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">ZIP code</label>
+        <input class="form-input" id="inp-zip" placeholder="90049" oninput="lookupZone()" />
+      </div>
+    </div>
+
+    <div class="zone-indicator" id="zoneIndicator"></div>
+
+    <div class="form-group">
+      <label class="form-label">Assign to zone</label>
+      <select class="form-select" id="inp-zone">
+        <option value="">— Select a zone —</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="inp-status">
+        <option value="cold">Cold</option>
+        <option value="warm">Warm</option>
+        <option value="hot">Hot</option>
+        <option value="client">Client</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="inp-notes" placeholder="Met at door knock on Amalfi Dr, interested in selling spring 2026" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+      <button class="btn-submit" id="submitBtn" onclick="addSubscriber()">Add subscriber</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://gykkvpfbyjllomthdlmw.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_bOBUK_TtANfu365rkKlj1w_wHuMWT-y';
+  const { createClient } = supabase;
+  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentUser = null;
+  let allSubscribers = [];
+  let allZones = [];
+  let activeFilter = 'all';
+  let searchQuery = '';
+
+  async function init() {
+    const { data: { session } } = await client.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    currentUser = session.user;
+    document.getElementById('authCheck').style.display = 'none';
+    await Promise.all([loadSubscribers(), loadZones()]);
+  }
+
+  async function loadZones() {
+    const { data } = await client.from('zones').select('id, name, color').eq('agent_id', currentUser.id).order('name');
+    allZones = data || [];
+    const select = document.getElementById('inp-zone');
+    select.innerHTML = '<option value="">— Select a zone —</option>';
+    allZones.forEach(z => {
+      const opt = document.createElement('option');
+      opt.value = z.id;
+      opt.textContent = z.name;
+      select.appendChild(opt);
+    });
+  }
+
+  async function loadSubscribers() {
+    const { data } = await client.from('subscribers').select('*, zones(name, color)').eq('agent_id', currentUser.id).order('created_at', { ascending: false });
+    allSubscribers = data || [];
+    renderTable();
+    updateCounts();
+  }
+
+  function updateCounts() {
+    document.getElementById('totalCount').textContent = allSubscribers.length;
+    document.getElementById('hotCount').textContent = allSubscribers.filter(s => s.status === 'hot').length;
+    document.getElementById('clientCount').textContent = allSubscribers.filter(s => s.status === 'client').length;
+  }
+
+  function renderTable() {
+    const body = document.getElementById('subTableBody');
+    const empty = document.getElementById('emptyState');
+    body.innerHTML = '';
+
+    let filtered = allSubscribers;
+    if (activeFilter !== 'all') filtered = filtered.filter(s => s.status === activeFilter);
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(s =>
+        (s.first_name + ' ' + s.last_name).toLowerCase().includes(q) ||
+        (s.email || '').toLowerCase().includes(q) ||
+        (s.address || '').toLowerCase().includes(q)
+      );
+    }
+
+    if (filtered.length === 0) {
+      empty.style.display = 'block';
+      document.getElementById('subTable').style.display = allSubscribers.length === 0 ? 'none' : 'table';
+      return;
+    }
+
+    empty.style.display = 'none';
+    document.getElementById('subTable').style.display = 'table';
+
+    filtered.forEach(sub => {
+      const initials = (sub.first_name[0] + sub.last_name[0]).toUpperCase();
+      const zone = sub.zones;
+      const date = new Date(sub.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(sub.email || '')}&su=${encodeURIComponent('Checking in — Front Porch LA')}`;
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>
+          <div class="cell-name">
+            <div class="cell-avatar">${initials}</div>
+            <div>
+              <div class="cell-name-text">${sub.first_name} ${sub.last_name}</div>
+              <div class="cell-sub">${sub.address || sub.email || '—'}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          ${zone ? `<div class="cell-zone"><div class="cell-zone-dot" style="background:${zone.color}"></div><div class="cell-zone-name">${zone.name}</div></div>` : '<span style="color:var(--light);font-size:12px;">No zone</span>'}
+        </td>
+        <td><span class="status-pill status-${sub.status}">${sub.status}</span></td>
+        <td><span class="cell-score">${sub.engagement_score}</span></td>
+        <td><span style="font-size:12px;color:var(--light);">${date}</span></td>
+        <td>
+          <div class="cell-actions">
+            ${sub.email ? `<button class="action-btn primary" onclick="event.stopPropagation();window.open('${gmailUrl}','_blank')">Email</button>` : ''}
+            ${sub.phone ? `<button class="action-btn" onclick="event.stopPropagation();window.location.href='tel:${sub.phone}'">Call</button>` : ''}
+            <button class="action-btn" onclick="event.stopPropagation();deleteSubscriber('${sub.id}')">Remove</button>
+          </div>
+        </td>
+      `;
+      body.appendChild(row);
+    });
+  }
+
+  function filterStatus(el, status) {
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    activeFilter = status;
+    renderTable();
+  }
+
+  function filterSearch(val) {
+    searchQuery = val;
+    renderTable();
+  }
+
+  function openAddModal() {
+    document.getElementById('addModal').classList.add('open');
+    document.getElementById('inp-first').focus();
+  }
+
+  function closeAddModal() {
+    document.getElementById('addModal').classList.remove('open');
+    ['inp-first','inp-last','inp-email','inp-phone','inp-address','inp-city','inp-zip','inp-notes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('inp-zone').value = '';
+    document.getElementById('inp-status').value = 'cold';
+    document.getElementById('zoneIndicator').className = 'zone-indicator';
+  }
+
+  function lookupZone() {
+    const address = document.getElementById('inp-address').value.trim();
+    const zip = document.getElementById('inp-zip').value.trim();
+    const indicator = document.getElementById('zoneIndicator');
+    if (!zip || zip.length < 5) { indicator.className = 'zone-indicator'; return; }
+    const westside = ['90049','90272','90210','90077','90024','90025','90064','90066','90291','90292','90402'];
+    if (westside.includes(zip)) {
+      indicator.className = 'zone-indicator visible';
+      indicator.textContent = 'This address appears to be in the Westside — select the matching zone below.';
+    } else {
+      indicator.className = 'zone-indicator warning visible';
+      indicator.textContent = 'This address may be outside your current zones. You can still add them and assign a zone manually.';
+    }
+  }
+
+  async function addSubscriber() {
+    const first = document.getElementById('inp-first').value.trim();
+    const last = document.getElementById('inp-last').value.trim();
+    if (!first || !last) { showToast('First and last name are required', 'error'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+
+    const zoneId = document.getElementById('inp-zone').value || null;
+    const { error } = await client.from('subscribers').insert({
+      first_name: first,
+      last_name: last,
+      email: document.getElementById('inp-email').value.trim() || null,
+      phone: document.getElementById('inp-phone').value.trim() || null,
+      address: document.getElementById('inp-address').value.trim() || null,
+      city: document.getElementById('inp-city').value.trim() || null,
+      zip: document.getElementById('inp-zip').value.trim() || null,
+      zone_id: zoneId,
+      status: document.getElementById('inp-status').value,
+      notes: document.getElementById('inp-notes').value.trim() || null,
+      agent_id: currentUser.id
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Add subscriber';
+
+    if (error) { showToast('Error adding subscriber — ' + error.message, 'error'); return; }
+
+    showToast(first + ' ' + last + ' added', 'success');
+    closeAddModal();
+    await loadSubscribers();
+  }
+
+  async function deleteSubscriber(id) {
+    if (!confirm('Remove this subscriber? This cannot be undone.')) return;
+    const { error } = await client.from('subscribers').delete().eq('id', id);
+    if (error) { showToast('Error removing subscriber', 'error'); return; }
+    showToast('Subscriber removed');
+    await loadSubscribers();
+  }
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast visible ' + type;
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  init();
+</script>
+</body>
+</html>
