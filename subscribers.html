@@ -392,8 +392,9 @@
       badge.className = 'zone-badge found';
       badgeText.innerHTML = `<strong>${zone.zone_name}</strong> — this address is in your zone`;
     } else {
-      badge.className = 'zone-badge not-found';
-      badgeText.innerHTML = `Outside your current zones — <a href="zones.html" target="_blank">Create a zone</a> for this area`;
+     badge.className = 'zone-badge not-found';
+      const addrEncoded = encodeURIComponent(document.getElementById('inp-address').value);
+      badgeText.innerHTML = `Outside your current zones — <a href="zones.html?lat=${lat}&lng=${lng}&address=${addrEncoded}" target="_blank">Create a zone</a> for this area`;
     }
   }
 
