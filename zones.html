@@ -277,7 +277,14 @@
       });
     });
   }
-
+async function loadZoneCounts() {
+    const { data } = await client.from('zone_subscriber_counts').select('id, subscriber_count');
+    if (!data) return;
+    data.forEach(row => {
+      const el = document.getElementById('zcount-' + row.id);
+      if (el) el.textContent = (row.subscriber_count || 0) + ' subs';
+    });
+  }
   async function deleteZone(id, event) {
     event.stopPropagation();
     if (!confirm('Delete this zone? This cannot be undone.')) return;
