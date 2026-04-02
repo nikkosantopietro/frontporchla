@@ -9,12 +9,14 @@ const supabase = createClient(
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const SCORE_OPEN = 5;
-const SCORE_CLICK = 15;
-const SCORE_CLICK_DOUBLE_BONUS = 10;
-const SCORE_OPEN_STREAK_BONUS = 20;
-const SCORE_CLICK_STREAK_BONUS = 40;
-const SCORE_NO_OPEN_PENALTY = -5;
-const HOT_ALERT_THRESHOLD = 60;
+const SCORE_CLICK = 10;
+const SCORE_RETURN_FIRST = 25;
+const SCORE_RETURN_SECOND = 35;
+const SCORE_RETURN_THIRD = 50;
+const SCORE_NO_OPEN_PENALTY = -8;
+const SCORE_OPEN_STREAK_BONUS = 15;
+const SCORE_CLICK_STREAK_BONUS = 25;
+const HOT_ALERT_THRESHOLD = 75;
 
 function calcStatus(score) {
   if (score >= 100) return '🔥 On Fire';
@@ -72,7 +74,7 @@ module.exports = async (req, res) => {
 
   const events = req.body;
   if (!Array.isArray(events)) {
-    return res.status(400).json({ error: 'Invalid payload' });
+    return res.status(200).json({ received: true });
   }
 
   for (const event of events) {
@@ -81,7 +83,6 @@ module.exports = async (req, res) => {
 
     if (!email || !['open', 'click'].includes(eventType)) continue;
 
-    // Find subscriber by email
     const { data: subs, error: subError } = await supabase
       .from('subscribers')
       .select('*, zones(name)')
@@ -99,8 +100,6 @@ module.exports = async (req, res) => {
     if (eventType === 'open') {
       scoreDelta += SCORE_OPEN;
       updates.total_opens = (sub.total_opens || 0) + 1;
-
-      // Streak bonus: opened last month too
       if (sub.opened_last_month) {
         scoreDelta += SCORE_OPEN_STREAK_BONUS;
       }
@@ -108,14 +107,23 @@ module.exports = async (req, res) => {
     }
 
     if (eventType === 'click') {
-      scoreDelta += SCORE_CLICK;
       const newClicks = (sub.monthly_clicks || 0) + 1;
       updates.monthly_clicks = newClicks;
       updates.total_opens = (sub.total_opens || 0) + 1;
 
-      // Double click bonus
-      if (newClicks === 2) {
-        scoreDelta += SCORE_CLICK_DOUBLE_BONUS;
+      // Base click points
+      scoreDelta += SCORE_CLICK;
+
+      // Return visit scoring based on session count
+      const returnVisits = sub.return_visit_count || 0;
+      if (returnVisits === 0) {
+        // first return visit
+      } else if (returnVisits === 1) {
+        scoreDelta += SCORE_RETURN_FIRST;
+      } else if (returnVisits === 2) {
+        scoreDelta += SCORE_RETURN_SECOND;
+      } else if (returnVisits >= 3) {
+        scoreDelta += SCORE_RETURN_THIRD;
       }
 
       // Click streak bonus
@@ -124,7 +132,7 @@ module.exports = async (req, res) => {
       }
       updates.clicked_last_month = true;
 
-      // Alert: 3+ clicks in a month
+      // Alert: 3+ clicks in a month and score will cross threshold
       if (newClicks >= 3 && !sub.alert_sent_this_month) {
         alertReason = `${sub.first_name} just clicked your ${sub.zones ? sub.zones.name : ''} report for the ${newClicks === 3 ? 'third' : newClicks + 'th'} time this month.`;
       }
@@ -134,25 +142,22 @@ module.exports = async (req, res) => {
     updates.engagement_score = newScore;
     updates.last_contacted = new Date().toISOString();
 
-    // Alert: score crosses 60 for first time
+    // Alert: score crosses 75 for first time
     if (prevScore < HOT_ALERT_THRESHOLD && newScore >= HOT_ALERT_THRESHOLD && !sub.alert_sent_this_month) {
-      alertReason = `${sub.first_name}'s engagement score just crossed ${HOT_ALERT_THRESHOLD} for the first time — they're heating up.`;
+      alertReason = `${sub.first_name}'s engagement score just crossed ${HOT_ALERT_THRESHOLD} — they're a hot lead.`;
     }
 
-    // Alert: score jumped 30+ points in one event
+    // Alert: score jumped 30+ points
     if (scoreDelta >= 30 && !sub.alert_sent_this_month) {
-      alertReason = `${sub.first_name}'s score jumped ${scoreDelta} points in a single session — unusually high engagement.`;
+      alertReason = `${sub.first_name}'s score jumped ${scoreDelta} points in one session — unusually high engagement.`;
     }
 
-    // Update subscriber
     await supabase
       .from('subscribers')
       .update(updates)
       .eq('id', sub.id);
 
-    // Send hot lead alert if triggered
     if (alertReason) {
-      // Get agent email
       const { data: agentData } = await supabase
         .from('agents')
         .select('email, reply_to_email')
@@ -166,8 +171,6 @@ module.exports = async (req, res) => {
       if (agentEmail) {
         const subWithZone = { ...sub, ...updates, zone_name: sub.zones ? sub.zones.name : null };
         await sendHotLeadAlert(subWithZone, agentEmail, alertReason);
-
-        // Mark alert sent this month
         await supabase
           .from('subscribers')
           .update({ alert_sent_this_month: true })
