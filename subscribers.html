@@ -700,7 +700,10 @@ let editAutocomplete = null;
           } else {
             editDetectedZoneId = null;
             badge.className = 'zone-badge not-found';
-            badgeText.innerHTML = `Outside your zones — no zone assigned`;
+            const editAddr = encodeURIComponent(document.getElementById('edit-address').value);
+            const editLat = place.geometry.location.lat();
+            const editLng = place.geometry.location.lng();
+            badgeText.innerHTML = `Outside your zones — <a href="zones.html?lat=${editLat}&lng=${editLng}&address=${editAddr}" target="_blank">create a zone</a> for this area`;
           }
         });
       }
