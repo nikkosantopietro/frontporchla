@@ -11,7 +11,11 @@
       ]
     }
   ],
-  "crons": [
+ "crons": [
+    {
+      "path": "/api/score-reset",
+      "schedule": "0 15 1 * *"
+    },
     {
       "path": "/api/monthly-send",
       "schedule": "0 16 1 * *"
