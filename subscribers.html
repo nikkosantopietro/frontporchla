@@ -678,10 +678,23 @@ let editAutocomplete = null;
     editDetectedZoneId = undefined;
     document.getElementById('editModal').classList.add('open');
     window.addEventListener('focus', async function recheckZone() {
-      if (!document.getElementById('edit-address').value.trim()) return;
-      const addr = document.getElementById('edit-address').value.trim();
-      if (editDetectedZoneId !== undefined) return;
       window.removeEventListener('focus', recheckZone);
+      const addr = document.getElementById('edit-address').value.trim();
+      if (!addr) return;
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ address: addr }, async (results, status) => {
+        if (status !== 'OK' || !results[0]) return;
+        const lat = results[0].geometry.location.lat();
+        const lng = results[0].geometry.location.lng();
+        const { data, error } = await client.rpc('match_zone_for_point', { lat, lng, agent: currentUser.id });
+        const badge = document.getElementById('editZoneBadge');
+        const badgeText = document.getElementById('editZoneBadgeText');
+        if (!error && data && data.length > 0) {
+          editDetectedZoneId = data[0].zone_id;
+          badge.className = 'zone-badge found';
+          badgeText.innerHTML = `<strong>${data[0].zone_name}</strong> — this address is in your zone`;
+        }
+      });
     });
 
     setTimeout(() => {
