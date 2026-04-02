@@ -730,6 +730,8 @@ let editAutocomplete = null;
 
     if (editDetectedZoneId !== undefined) {
       updates.zone_id = editDetectedZoneId;
+    } else if (!document.getElementById('edit-address').value.trim()) {
+      updates.zone_id = null;
     }
 
     const { error } = await client.from('subscribers').update(updates).eq('id', selectedSubId);
