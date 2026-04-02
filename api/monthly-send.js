@@ -14,9 +14,11 @@ const MONTHS = ['January','February','March','April','May','June','July','August
 
 module.exports = async (req, res) => {
   // Allow manual trigger with secret or cron
-  const authHeader = req.headers['authorization'];
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return res.status(401).json({ error: 'Unauthorized' });
+ const authHeader = req.headers['authorization'];
+  const cronSecret = process.env.CRON_SECRET;
+  console.log('Auth header:', authHeader, 'Expected:', `Bearer ${cronSecret}`);
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    return res.status(401).json({ error: 'Unauthorized', received: authHeader, expected: `Bearer ${cronSecret}` });
   }
 
   const now = new Date();
