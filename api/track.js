@@ -92,6 +92,13 @@ async function triggerHotLeadAlert(subscriberId) {
 
     if (!agent) return;
 
+    const { data: clicks } = await supabase
+      .from('link_clicks')
+      .select('link_key, destination, created_at')
+      .eq('subscriber_id', subscriberId)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
     const sgMail = require('@sendgrid/mail');
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -99,37 +106,137 @@ async function triggerHotLeadAlert(subscriberId) {
     const subscriberName = sub.first_name + ' ' + sub.last_name;
     const zoneName = sub.zones?.name || 'Unknown Zone';
 
+    const LINK_LABELS = {
+      'capital-gains': 'Capital gains calculator',
+      'home-value': 'How is my home valued?',
+      'home-value-tool': 'Home value page',
+      'listings': 'View listings',
+      'contact': 'Get in touch',
+      'mortgage': 'Mortgage calculator'
+    };
+
+    const LINK_SCORES = {
+      'capital-gains': 25,
+      'home-value': 15,
+      'home-value-tool': 15,
+      'listings': 10,
+      'contact': 20,
+      'mortgage': 15
+    };
+
+    const clickRowsHtml = clicks && clicks.length > 0
+      ? clicks.map(c => {
+          const label = LINK_LABELS[c.link_key] || c.link_key;
+          const pts = LINK_SCORES[c.link_key] || 10;
+          const date = new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          const time = new Date(c.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+          return `
+            <tr>
+              <td style="padding:7px 0;font-size:13px;color:#2c2825;border-bottom:1px solid #f0ece8;">${label}</td>
+              <td style="padding:7px 0;font-size:12px;color:#9b9088;border-bottom:1px solid #f0ece8;">${date} · ${time}</td>
+              <td style="padding:7px 0;text-align:right;border-bottom:1px solid #f0ece8;"><span style="font-size:11px;font-weight:500;color:#3d5a47;background:#ebf0ec;padding:2px 8px;border-radius:100px;">+${pts} pts</span></td>
+            </tr>`;
+        }).join('')
+      : '<tr><td colspan="3" style="padding:8px 0;font-size:13px;color:#9b9088;">No clicks recorded yet</td></tr>';
+
+    const topClick = clicks && clicks.length > 0 ? clicks[0].link_key : null;
+    const callScript = topClick === 'capital-gains'
+      ? '"Hey ' + sub.first_name + ', it\'s ' + agentFirstName + ' — I just noticed you unsubscribed from my ' + zoneName + ' updates. Totally fine, just wanted to make sure I wasn\'t sending something you didn\'t find useful. Is there anything I could do differently?"'
+      : '"Hey ' + sub.first_name + ', it\'s ' + agentFirstName + ' — I just noticed you unsubscribed from my ' + zoneName + ' updates. Totally fine, just wanted to make sure I wasn\'t sending something you didn\'t find useful. Is there anything I could do differently?"';
+
     await sgMail.send({
       to: agent.reply_to_email,
       from: { email: 'monthly@frontporchla.com', name: 'Front Porch LA' },
       subject: 'Call ' + sub.first_name + ' ' + sub.last_name + ' today',
       html: `
-        <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;background:#fdfaf7;border:1px solid #e8ddd0;border-radius:12px;overflow:hidden;">
-          <div style="background:#B5652A;padding:20px 24px;">
-            <p style="margin:0;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.7);">Front Porch LA</p>
-            <p style="margin:6px 0 0;font-size:20px;color:#fff;font-family:Georgia,serif;">Hot lead alert</p>
-          </div>
-          <div style="padding:24px;">
-            <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
-              <tr><td style="padding:8px 0;font-size:13px;color:#9b9088;border-bottom:1px solid #e8ddd0;">Name</td><td style="padding:8px 0;font-size:13px;color:#2c2825;text-align:right;border-bottom:1px solid #e8ddd0;">${subscriberName}</td></tr>
-              <tr><td style="padding:8px 0;font-size:13px;color:#9b9088;border-bottom:1px solid #e8ddd0;">Phone</td><td style="padding:8px 0;font-size:13px;color:#B5652A;text-align:right;border-bottom:1px solid #e8ddd0;">${sub.phone || '—'}</td></tr>
-              <tr><td style="padding:8px 0;font-size:13px;color:#9b9088;border-bottom:1px solid #e8ddd0;">Zone</td><td style="padding:8px 0;font-size:13px;color:#2c2825;text-align:right;border-bottom:1px solid #e8ddd0;">${zoneName}</td></tr>
-              <tr><td style="padding:8px 0;font-size:13px;color:#9b9088;border-bottom:1px solid #e8ddd0;">Score</td><td style="padding:8px 0;font-size:13px;color:#2c2825;text-align:right;border-bottom:1px solid #e8ddd0;">${sub.engagement_score}</td></tr>
-              <tr><td style="padding:8px 0;font-size:13px;color:#9b9088;">Clicks this month</td><td style="padding:8px 0;font-size:13px;color:#2c2825;text-align:right;">${sub.monthly_clicks}</td></tr>
-            </table>
-            <div style="margin-bottom:20px;padding:14px;background:#fef3dc;border-radius:8px;">
-              <p style="margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#9b9088;">When you call</p>
-              <p style="margin:0;font-size:14px;color:#6b6058;font-style:italic;line-height:1.6;">"Hey ${sub.first_name}, it's ${agentFirstName} — just wanted to reach out, I noticed you've been checking out some of the market info I sent over. Anything catch your eye?"</p>
-            </div>
-            <table style="width:100%;border-collapse:collapse;">
-              <tr>
-                <td style="padding-right:8px;"><a href="tel:${sub.phone}" style="display:block;background:#B5652A;border-radius:100px;padding:12px;text-align:center;font-size:13px;color:#fff;text-decoration:none;">Call ${sub.first_name}</a></td>
-                <td style="padding-left:8px;"><a href="mailto:${sub.email}" style="display:block;background:#f2f7ee;border:1px solid #d4e8c8;border-radius:100px;padding:12px;text-align:center;font-size:13px;color:#3d5a47;text-decoration:none;">Email ${sub.first_name}</a></td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f0f4ee;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f4ee;padding:32px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;">
+
+  <tr>
+    <td style="background:#3d5a47;padding:24px 32px;">
+      <p style="margin:0 0 4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#b8d4a8;">Front Porch LA</p>
+      <p style="margin:0;font-size:22px;color:#ffffff;font-family:Georgia,serif;">Call ${sub.first_name} ${sub.last_name} today</p>
+    </td>
+  </tr>
+
+  <tr><td style="height:3px;background:#8ab87a;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+  <tr>
+    <td style="padding:24px 32px;border-bottom:1px solid #e8ddd0;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="50%" style="padding-bottom:14px;">
+            <p style="margin:0 0 3px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#9b9088;">Name</p>
+            <p style="margin:0;font-size:15px;color:#2c2825;">${subscriberName}</p>
+          </td>
+          <td width="50%" style="padding-bottom:14px;">
+            <p style="margin:0 0 3px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#9b9088;">Zone</p>
+            <p style="margin:0;font-size:15px;color:#2c2825;">${zoneName}</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="50%">
+            <p style="margin:0 0 3px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#9b9088;">Phone</p>
+            <p style="margin:0;font-size:15px;color:#B5652A;">${sub.phone || '—'}</p>
+          </td>
+          <td width="50%">
+            <p style="margin:0 0 3px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#9b9088;">Score</p>
+            <p style="margin:0;font-size:15px;color:#2c2825;">${sub.engagement_score} · ${getStatus(sub.engagement_score)}</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:24px 32px;border-bottom:1px solid #e8ddd0;background:#fafcf8;">
+      <p style="margin:0 0 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#9b9088;">What she clicked</p>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        ${clickRowsHtml}
+      </table>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:24px 32px;border-bottom:1px solid #e8ddd0;">
+      <p style="margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#9b9088;">When you call</p>
+      <p style="margin:0;font-size:14px;color:#6b6058;line-height:1.7;font-style:italic;font-family:Georgia,serif;">${callScript}</p>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:20px 32px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="50%" style="padding-right:8px;">
+            <a href="tel:${sub.phone}" style="display:block;background:#B5652A;border-radius:100px;padding:12px;text-align:center;font-size:13px;color:#fff;text-decoration:none;">Call ${sub.first_name}</a>
+          </td>
+          <td width="50%" style="padding-left:8px;">
+            <a href="mailto:${sub.email}" style="display:block;background:#f2f7ee;border:1px solid #d4e8c8;border-radius:100px;padding:12px;text-align:center;font-size:13px;color:#3d5a47;text-decoration:none;">Email ${sub.first_name}</a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr><td style="height:3px;background:#8ab87a;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+  <tr>
+    <td style="background:#1e3318;padding:16px 32px;text-align:center;">
+      <p style="margin:0;font-size:11px;color:#8ab87a;">Front Porch LA · The Agency Beverly Hills</p>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`
     });
 
     await supabase
@@ -140,4 +247,11 @@ async function triggerHotLeadAlert(subscriberId) {
   } catch (err) {
     console.error('Hot lead alert error:', err);
   }
+}
+
+function getStatus(score) {
+  if (!score || score <= 20) return 'Cold';
+  if (score <= 50) return 'Warm';
+  if (score <= 99) return 'Hot';
+  return 'On Fire';
 }
