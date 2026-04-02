@@ -585,8 +585,8 @@
     document.getElementById('profileName').textContent = sub.first_name + ' ' + sub.last_name;
     const zone = sub.zones;
     document.getElementById('profileZone').innerHTML = zone
-      ? `<div style="width:8px;height:8px;border-radius:50%;background:${zone.color};flex-shrink:0;"></div> ${zone.name}`
-      : '<span style="color:var(--light);">No zone assigned</span>';
+      ? `<div style="width:8px;height:8px;border-radius:50%;background:${zone.color};flex-shrink:0;"></div><span style="color:var(--green);font-weight:500;">${zone.name}</span>`
+      : `<span style="color:#A32D2D;font-weight:500;">No zone</span> &nbsp;<a href="zones.html" target="_blank" style="color:#A32D2D;font-size:11px;text-decoration:underline;">Create a zone →</a>`;
     document.getElementById('profileScore').textContent = score;
     document.getElementById('profileScore').className = `profile-score-num ${scoreColorClass(status)}`;
     document.getElementById('profileStatusPill').innerHTML = `<span class="status-pill status-${status}">${statusLabel(status)}</span>`;
