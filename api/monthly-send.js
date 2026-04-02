@@ -81,12 +81,17 @@ module.exports = async (req, res) => {
         const zip = getZipFromAddress(sampleAddress);
         const marketStats = zip ? await getMarketStats(zip) : null;
 
-        const article = await generateArticle(
-          zone?.name || 'Your Neighborhood',
-          marketStats || {},
-          month,
-          year
-        );
+    let article = { title: zone?.name + ' in ' + month + ': What You Need to Know', body: 'Your ' + (zone?.name || 'neighborhood') + ' market continued to show strong activity this ' + month + '.' };
+try {
+  article = await generateArticle(
+    zone?.name || 'Your Neighborhood',
+    marketStats || {},
+    month,
+    year
+  );
+} catch (err) {
+  console.error('Article generation failed, using fallback:', err);
+}
 
         for (const sub of zoneSubs) {
           try {
