@@ -1,59 +1,108 @@
 const ATTOM_BASE = 'https://api.gateway.attomdata.com/propertyapi/v1.0.0';
 
-const headers = {
+const headers = () => ({
   'apikey': process.env.ATTOM_API_KEY,
   'Accept': 'application/json'
-};
+});
 
-// Get AVM estimate for a specific address
 async function getAVM(address) {
   try {
-    const encoded = encodeURIComponent(address);
-    const res = await fetch(`${ATTOM_BASE}/valuation/homequity?address=${encoded}`, { headers });
-    if (!res.ok) return null;
+    const parts = parseAddress(address);
+    if (!parts) return null;
+
+    const params = new URLSearchParams({
+      address1: parts.street,
+      address2: parts.cityStateZip
+    });
+
+    const res = await fetch(`${ATTOM_BASE}/avm/detail?${params}`, {
+      headers: headers()
+    });
+
+    if (!res.ok) {
+      console.error('ATTOM AVM error status:', res.status, await res.text());
+      return null;
+    }
+
     const data = await res.json();
     const property = data?.property?.[0];
     if (!property) return null;
+
     const avm = property?.avm;
     return {
       estimate: avm?.amount?.value || null,
       low: avm?.amount?.low || null,
       high: avm?.amount?.high || null,
-      change: avm?.amount?.valueChange || null,
+      change: avm?.chng?.value || null,
     };
   } catch (e) {
-    console.error('ATTOM AVM error:', e);
+    console.error('ATTOM AVM exception:', e);
     return null;
   }
 }
 
-// Get market stats for a zip code
 async function getMarketStats(zip) {
   try {
-    const res = await fetch(`${ATTOM_BASE}/sale/snapshot?postalcode=${zip}&startsalesearchdate=${getLastMonthStart()}&endsalesearchdate=${getLastMonthEnd()}`, { headers });
-    if (!res.ok) return null;
+    const endDate = getLastMonthEnd();
+    const startDate = getLastMonthStart();
+
+    const params = new URLSearchParams({
+      postalcode: zip,
+      startsalesearchdate: startDate,
+      endsalesearchdate: endDate
+    });
+
+    const res = await fetch(`${ATTOM_BASE}/sale/snapshot?${params}`, {
+      headers: headers()
+    });
+
+    if (!res.ok) {
+      console.error('ATTOM Sales error status:', res.status, await res.text());
+      return null;
+    }
+
     const data = await res.json();
     const sales = data?.property || [];
     if (sales.length === 0) return null;
 
-    const prices = sales.map(p => p?.sale?.amount?.saleamt).filter(Boolean);
-    const medianPrice = median(prices);
-    const avgDom = average(sales.map(p => p?.sale?.amount?.salediscountpercent).filter(Boolean));
+    const prices = sales
+      .map(p => p?.sale?.amount?.saleamt)
+      .filter(v => v && v > 0);
+
+    const domValues = sales
+      .map(p => p?.sale?.calculation?.daysOnMarket)
+      .filter(v => v && v > 0);
+
     const sqftPrices = sales.map(p => {
       const price = p?.sale?.amount?.saleamt;
       const sqft = p?.building?.size?.universalsize;
-      return price && sqft ? price / sqft : null;
+      return price && sqft && sqft > 0 ? Math.round(price / sqft) : null;
     }).filter(Boolean);
 
+    const saleToListValues = sales
+      .map(p => p?.sale?.amount?.saleToListPriceRatio)
+      .filter(v => v && v > 0);
+
     return {
-      medianPrice: medianPrice ? formatCurrency(medianPrice) : null,
+      medianPrice: prices.length > 0 ? formatCurrency(median(prices)) : null,
       homesSold: sales.length,
       pricePerSqFt: sqftPrices.length > 0 ? '$' + Math.round(average(sqftPrices)).toLocaleString() : null,
+      daysOnMarket: domValues.length > 0 ? Math.round(average(domValues)).toString() : null,
+      saleToList: saleToListValues.length > 0 ? Math.round(average(saleToListValues) * 100) + '%' : null,
     };
   } catch (e) {
-    console.error('ATTOM market stats error:', e);
+    console.error('ATTOM market stats exception:', e);
     return null;
   }
+}
+
+function parseAddress(fullAddress) {
+  if (!fullAddress) return null;
+  const parts = fullAddress.split(',');
+  if (parts.length < 2) return null;
+  const street = parts[0].trim();
+  const cityStateZip = parts.slice(1).join(',').trim();
+  return { street, cityStateZip };
 }
 
 function median(arr) {
@@ -69,6 +118,7 @@ function average(arr) {
 }
 
 function formatCurrency(num) {
+  if (!num) return null;
   if (num >= 1000000) return '$' + (num / 1000000).toFixed(1) + 'M';
   if (num >= 1000) return '$' + Math.round(num / 1000) + 'K';
   return '$' + Math.round(num).toLocaleString();
