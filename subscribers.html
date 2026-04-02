@@ -675,11 +675,17 @@ let editAutocomplete = null;
     document.getElementById('edit-phone').value = sub.phone || '';
     document.getElementById('edit-address').value = sub.address || '';
     document.getElementById('editZoneBadge').className = 'zone-badge';
-    editDetectedZoneId = undefined;
+    editDetectedZoneId = 'checking';
     document.getElementById('editModal').classList.add('open');
-    document.addEventListener('visibilitychange', async function recheckZone() {
-      if (document.hidden) return;
-      document.removeEventListener('visibilitychange', recheckZone);
+    const zoneRecheckInterval = setInterval(async () => {
+      if (!document.getElementById('editModal').classList.contains('open')) {
+        clearInterval(zoneRecheckInterval);
+        return;
+      }
+      if (editDetectedZoneId !== null && editDetectedZoneId !== undefined && editDetectedZoneId !== 'checking') {
+        clearInterval(zoneRecheckInterval);
+        return;
+      }
       const addr = document.getElementById('edit-address').value.trim();
       if (!addr) return;
       const geocoder = new google.maps.Geocoder();
@@ -688,15 +694,14 @@ let editAutocomplete = null;
         const lat = results[0].geometry.location.lat();
         const lng = results[0].geometry.location.lng();
         const { data, error } = await client.rpc('match_zone_for_point', { lat, lng, agent: currentUser.id });
-        const badge = document.getElementById('editZoneBadge');
-        const badgeText = document.getElementById('editZoneBadgeText');
         if (!error && data && data.length > 0) {
           editDetectedZoneId = data[0].zone_id;
-          badge.className = 'zone-badge found';
-          badgeText.innerHTML = `<strong>${data[0].zone_name}</strong> — this address is in your zone`;
+          document.getElementById('editZoneBadge').className = 'zone-badge found';
+          document.getElementById('editZoneBadgeText').innerHTML = `<strong>${data[0].zone_name}</strong> — this address is in your zone`;
+          clearInterval(zoneRecheckInterval);
         }
       });
-    });
+    }, 2000);
 
     setTimeout(() => {
       if (!editAutocomplete && window.google) {
