@@ -217,7 +217,33 @@
     </div>
   </div>
 </main>
-
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title">Edit <em>subscriber.</em></div>
+    <div class="modal-sub">Update contact details. Zone is set automatically by address.</div>
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">First name *</label><input class="form-input" id="edit-first" placeholder="Sarah" /></div>
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">Last name *</label><input class="form-input" id="edit-last" placeholder="Reinhart" /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">Email</label><input class="form-input" id="edit-email" type="email" placeholder="sarah@email.com" /></div>
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">Phone</label><input class="form-input" id="edit-phone" type="tel" placeholder="310-555-0100" /></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Home address</label>
+      <input class="form-input" id="edit-address" placeholder="Start typing an address..." autocomplete="off" />
+    </div>
+    <div class="zone-badge" id="editZoneBadge">
+      <div class="zone-badge-dot"></div>
+      <span id="editZoneBadgeText"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-submit" id="editSubmitBtn" onclick="saveEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
 <!-- ADD MODAL -->
 <div class="modal-overlay" id="addModal">
   <div class="modal">
