@@ -663,7 +663,86 @@
     t.className = 'toast visible ' + type;
     setTimeout(() => t.className = 'toast', 3000);
   }
+let editAutocomplete = null;
+  let editDetectedZoneId = undefined;
 
+  function openEditModal() {
+    const sub = allSubscribers.find(s => s.id === selectedSubId);
+    if (!sub) return;
+    document.getElementById('edit-first').value = sub.first_name || '';
+    document.getElementById('edit-last').value = sub.last_name || '';
+    document.getElementById('edit-email').value = sub.email || '';
+    document.getElementById('edit-phone').value = sub.phone || '';
+    document.getElementById('edit-address').value = sub.address || '';
+    document.getElementById('editZoneBadge').className = 'zone-badge';
+    editDetectedZoneId = undefined;
+    document.getElementById('editModal').classList.add('open');
+
+    setTimeout(() => {
+      if (!editAutocomplete && window.google) {
+        editAutocomplete = new google.maps.places.Autocomplete(
+          document.getElementById('edit-address'),
+          { componentRestrictions: { country: 'us' }, fields: ['formatted_address', 'geometry'] }
+        );
+        editAutocomplete.addListener('place_changed', async () => {
+          const place = editAutocomplete.getPlace();
+          if (!place.geometry) return;
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+          document.getElementById('edit-address').value = place.formatted_address;
+          const { data, error } = await client.rpc('match_zone_for_point', { lat, lng, agent: currentUser.id });
+          const badge = document.getElementById('editZoneBadge');
+          const badgeText = document.getElementById('editZoneBadgeText');
+          if (!error && data && data.length > 0) {
+            editDetectedZoneId = data[0].zone_id;
+            badge.className = 'zone-badge found';
+            badgeText.innerHTML = `<strong>${data[0].zone_name}</strong> — this address is in your zone`;
+          } else {
+            editDetectedZoneId = null;
+            badge.className = 'zone-badge not-found';
+            badgeText.innerHTML = `Outside your zones — no zone assigned`;
+          }
+        });
+      }
+    }, 100);
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.remove('open');
+    editDetectedZoneId = undefined;
+  }
+
+  async function saveEdit() {
+    const first = document.getElementById('edit-first').value.trim();
+    const last = document.getElementById('edit-last').value.trim();
+    if (!first || !last) { showToast('First and last name are required', 'error'); return; }
+
+    const btn = document.getElementById('editSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Saving...';
+
+    const updates = {
+      first_name: first,
+      last_name: last,
+      email: document.getElementById('edit-email').value.trim() || null,
+      phone: document.getElementById('edit-phone').value.trim() || null,
+      address: document.getElementById('edit-address').value.trim() || null,
+    };
+
+    if (editDetectedZoneId !== undefined) {
+      updates.zone_id = editDetectedZoneId;
+    }
+
+    const { error } = await client.from('subscribers').update(updates).eq('id', selectedSubId);
+    btn.disabled = false; btn.textContent = 'Save changes';
+
+    if (error) { showToast('Error — ' + error.message, 'error'); return; }
+    showToast('Subscriber updated', 'success');
+    closeEditModal();
+    await loadSubscribers();
+
+    // Refresh profile panel with updated data
+    openProfile(selectedSubId);
+  }
   init();
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAaNEzDIZXk-tSuds24aQljvHSURJ2d2o&libraries=places&callback=initAutocomplete" async defer></script>
