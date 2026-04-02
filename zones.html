@@ -243,7 +243,7 @@
       item.innerHTML = `
         <div class="zone-item-color" style="background:${zone.color}"></div>
         <div class="zone-item-name">${zone.name}</div>
-        <div class="zone-item-count">${zone.subscriber_count || 0} subs</div>
+        <div class="zone-item-count" id="zcount-${zone.id}">— subs</div>
         <button class="zone-item-delete" onclick="deleteZone('${zone.id}', event)" title="Delete zone">×</button>
       `;
       list.appendChild(item);
