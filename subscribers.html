@@ -682,7 +682,7 @@ let editAutocomplete = null;
         clearInterval(zoneRecheckInterval);
         return;
       }
-      if (editDetectedZoneId !== null && editDetectedZoneId !== undefined && editDetectedZoneId !== 'checking') {
+     if (editDetectedZoneId && editDetectedZoneId !== 'checking') {
         clearInterval(zoneRecheckInterval);
         return;
       }
