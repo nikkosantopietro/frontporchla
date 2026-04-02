@@ -50,9 +50,10 @@ const authHeader = req.headers['authorization'];
       const { data: subscribers } = await supabase
         .from('subscribers')
         .select('*, zones(name, color)')
-        .eq('agent_id', agent.id)
-        .not('zone_id', 'is', null)
-        .not('email', 'is', null);
+      .eq('agent_id', agent.id)
+.eq('unsubscribed', false)
+.not('zone_id', 'is', null)
+.not('email', 'is', null)
 
       if (!subscribers || subscribers.length === 0) continue;
 
@@ -61,7 +62,8 @@ const authHeader = req.headers['authorization'];
         .from('subscribers')
         .select('id')
         .eq('agent_id', agent.id)
-        .is('zone_id', null);
+.eq('unsubscribed', false)
+.is('zone_id', null)
 
       // Group subscribers by zone
       const byZone = {};
