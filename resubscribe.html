@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome Back · Front Porch LA</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', Arial, sans-serif;
+      background: #F7F3EE;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #E8DDD0;
+      padding: 48px 40px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+    .logo {
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9B9088;
+      margin-bottom: 32px;
+    }
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #EBF0EC;
+      border: 1px solid #c8dbc9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 500;
+      color: #2C2825;
+      margin-bottom: 12px;
+      font-family: 'Playfair Display', Georgia, serif;
+    }
+    p {
+      font-size: 15px;
+      color: #6B6058;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .email-display {
+      background: #F7F3EE;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      color: #2C2825;
+      margin: 20px 0;
+      word-break: break-all;
+    }
+    .state { display: none; }
+    .state.active { display: block; }
+    #state-loading { display: block; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Front Porch LA</div>
+
+    <div id="state-loading" class="state active">
+      <p>One moment...</p>
+    </div>
+
+    <div id="state-success" class="state">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 3C6.13 3 3 6.13 3 10s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7zm-1 10L5.5 9.5l1.41-1.41L9 10.17l4.59-4.58L15 7l-6 6z" fill="#3D5A47"/>
+        </svg>
+      </div>
+      <h1>Welcome back</h1>
+      <p>You're back on the list. You'll receive next month's neighborhood report.</p>
+      <div class="email-display" id="email-display"></div>
+    </div>
+
+    <div id="state-error" class="state">
+      <h1>Something went wrong</h1>
+      <p>We couldn't process your request. Please reply to any email you received from us and we'll sort it out.</p>
+    </div>
+
+    <div id="state-missing" class="state">
+      <h1>Link not valid</h1>
+      <p>This link is missing the required information. Please use the link your agent sent you.</p>
+    </div>
+
+  </div>
+
+  <script>
+    function show(id) {
+      document.querySelectorAll('.state').forEach(el => el.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get('email');
+
+    if (!email) {
+      show('state-missing');
+    } else {
+      document.getElementById('email-display').textContent = email;
+
+      fetch('/api/resubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          show('state-success');
+        } else {
+          show('state-error');
+        }
+      })
+      .catch(() => show('state-error'));
+    }
+  </script>
+</body>
+</html>
