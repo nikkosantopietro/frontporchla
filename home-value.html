@@ -145,6 +145,28 @@
       <a href="index.html">Home</a> &nbsp;·&nbsp; <a href="mailto:monthly@frontporchla.com">Contact</a>
     </div>
   </div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  async function loadAgentContact() {
+    const params = new URLSearchParams(window.location.search);
+    const agentId = params.get('agent');
+    if (!agentId) return;
+    const { createClient } = window.supabase;
+    const client = createClient(
+      'https://gykkvpfbyjllomthdlmw.supabase.co',
+      'sb_publishable_bOBUK_TtANfu365rkKlj1w_wHuMWT-y'
+    );
+    const { data } = await client.from('agents').select('full_name, reply_to_email, email').eq('id', agentId).single();
+    if (!data) return;
+    const agentEmail = data.reply_to_email || data.email;
+    const firstName = (data.full_name || 'your agent').split(' ')[0];
+    const btn = document.getElementById('homeValueCta');
+    if (btn) {
+      btn.href = `mailto:${agentEmail}?subject=Free Home Estimate Request`;
+      btn.textContent = `Book Your Free 15-Minute Estimate with ${firstName} →`;
+    }
+  }
+  loadAgentContact();
+</script>
 </body>
 </html>
