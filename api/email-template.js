@@ -30,6 +30,7 @@ module.exports = function generateEmail(data) {
     contactUrl,
     unsubscribeUrl,
     agentId,
+    subscriberId,
   } = data;
 
   return `<!DOCTYPE html>
