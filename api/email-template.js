@@ -219,7 +219,7 @@ module.exports = function generateEmail(data) {
             </a>
           </td>
           <td width="50%" style="padding-left:8px;">
-            <a href="https://frontporchla.com/home-value.html?agent=${agentId}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:14px 16px;text-decoration:none;">
+            <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=home-value-tool&dest=${encodeURIComponent('https://frontporchla.com/home-value.html?agent=' + agentId)}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:14px 16px;text-decoration:none;">
               <p style="margin:0 0 4px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">🏡 How Is My Home Valued?</p>
               <p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Understand your ATTOM estimate</p>
             </a>
