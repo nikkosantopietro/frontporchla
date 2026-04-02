@@ -173,7 +173,7 @@ module.exports = function generateEmail(data) {
     <!-- ATTOM HOME VALUE -->
     <tr><td style="padding:28px 40px;border-bottom:1px solid #d4e8c8;">
       <p style="margin:0 0 10px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a6741;font-family:Arial,sans-serif;">Your Home's Estimated Value</p>
-      <a href="${homeValueUrl}" style="text-decoration:none;display:block;">
+      <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=home-value&dest=${encodeURIComponent(homeValueUrl)}" style="text-decoration:none;display:block;">
         <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr><td style="background:#1e3318;border-radius:8px;padding:20px 22px;">
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
