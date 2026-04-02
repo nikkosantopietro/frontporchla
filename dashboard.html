@@ -422,9 +422,13 @@ async function triggerMonthlySend() {
     btn.textContent = 'Sending...';
     status.textContent = '';
     try {
-      const res = await fetch('https://project-zdwup.vercel.app/api/monthly-send', {
+     const { data: { session } } = await client.auth.getSession();
+      const res = await fetch('/api/trigger-monthly', {
         method: 'POST',
-        headers: { 'Authorization': 'Bearer frontporchla2026sendmonthly' }
+        headers: {
+          'Content-Type': 'application/json',
+          'x-agent-token': session?.access_token || ''
+        }
       });
       const data = await res.json();
       if (data.success) {
