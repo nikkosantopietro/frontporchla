@@ -1,40 +1,42 @@
 const https = require('https');
 
 async function generateArticle(zoneName, marketStats, month, year) {
-  const prompt = `You are writing a warm, conversational neighborhood update for homeowners in ${zoneName}, a prestigious area on the Westside of Los Angeles. These are affluent, informed homeowners who want to feel connected to their neighborhood.
+  const medianPrice = marketStats.medianPrice || 'not available';
+  const pricePerSqFt = marketStats.pricePerSqFt || 'not available';
+  const homesSold = marketStats.homesSold || 'not available';
+  const daysOnMarket = marketStats.daysOnMarket || 'not available';
+  const saleToList = marketStats.saleToList || 'not available';
 
-Search the web for the following — prioritize results from the last 60 days:
-1. Notable restaurant openings, chef-driven spots, or buzzy dining news in or near ${zoneName}
-2. Celebrity home sales, notable property transactions, or architectural news in ${zoneName} or nearby Westside neighborhoods
-3. Local entertainment — new boutiques, art shows, pop-ups, events, or cultural moments
-4. Any development, construction, or zoning news that affects the neighborhood
-5. Anything a well-connected neighbor would be talking about at a dinner party
+  const prompt = 'You are writing a warm, conversational neighborhood update for homeowners in ' + zoneName + ', a prestigious area on the Westside of Los Angeles. These are affluent, informed homeowners who want to feel connected to their neighborhood.\n\n' +
+    'Search the web for the following — prioritize results from the last 60 days:\n' +
+    '1. Notable restaurant openings, chef-driven spots, or buzzy dining news in or near ' + zoneName + '\n' +
+    '2. Celebrity home sales, notable property transactions, or architectural news in ' + zoneName + ' or nearby Westside neighborhoods\n' +
+    '3. Local entertainment — new boutiques, art shows, pop-ups, events, or cultural moments\n' +
+    '4. Any development, construction, or zoning news that affects the neighborhood\n' +
+    '5. Anything a well-connected neighbor would be talking about at a dinner party\n\n' +
+    'Then write a short neighborhood article (2-3 paragraphs, 120-180 words total) for ' + month + ' ' + year + ' using both what you found AND these market stats:\n' +
+    '- Median sale price: ' + medianPrice + '\n' +
+    '- Price per sq ft: ' + pricePerSqFt + '\n' +
+    '- Homes sold: ' + homesSold + '\n' +
+    '- Days on market: ' + daysOnMarket + '\n' +
+    '- Sale-to-list ratio: ' + saleToList + '\n\n' +
+    'Guidelines:\n' +
+    '- Open with the most interesting local story you found — something specific, real, and worth talking about\n' +
+    '- If you found a celebrity sale or notable property transaction, lead with that\n' +
+    '- Weave market stats naturally into the second paragraph — do not list them, contextualize them\n' +
+    '- End with one forward-looking sentence about what this means for homeowners\n' +
+    '- Tone: warm, intelligent, insider — like a well-connected neighbor who happens to know the market cold\n' +
+    '- Never salesy, never corporate, never generic\n' +
+    '- Only reference things you actually found — never invent names, prices, or details\n' +
+    '- Do not mention the agent by name\n' +
+    '- Do not use the phrase pull up a chair\n\n' +
+    'Respond in JSON format only with two fields:\n' +
+    '{\n' +
+    '  "title": "a specific, compelling 8-12 word headline — reference something real if you found it",\n' +
+    '  "body": "the full article text"\n' +
+    '}';
 
-Then write a short neighborhood article (2-3 paragraphs, 120-180 words total) for ${month} ${year} using both what you found AND these market stats:
-- Median sale price: ${marketStats.medianPrice || 'not available'}
-- Price per sq ft: ${marketStats.pricePerSqFt || 'not available'}
-- Homes sold: ${marketStats.homesSold || 'not available'}
-- Days on market: ${marketStats.daysOnMarket || 'not available'}
-- Sale-to-list ratio: ${marketStats.saleToList || 'not available'}
-
-Guidelines:
-- Open with the most interesting local story you found — something specific, real, and worth talking about
-- If you found a celebrity sale or notable property transaction, lead with that
-- Weave market stats naturally into the second paragraph — don't list them, contextualize them
-- End with one forward-looking sentence about what this means for homeowners
-- Tone: warm, intelligent, insider — like a well-connected neighbor who happens to know the market cold
-- Never salesy, never corporate, never generic
-- Only reference things you actually found — never invent names, prices, or details
-- Do not mention the agent by name
-- Do not use the phrase "pull up a chair"
-
-Respond in JSON format only with two fields:
-{
-  "title": "a specific, compelling 8-12 word headline — reference something real if you found it",
-  "body": "the full article text"
-}`;
-
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve) {
     const data = JSON.stringify({
       model: 'claude-opus-4-5',
       max_tokens: 1024,
@@ -60,35 +62,35 @@ Respond in JSON format only with two fields:
       }
     };
 
-    const req = https.request(options, (res) => {
+    const req = https.request(options, function(res) {
       let body = '';
-      res.on('data', chunk => body += chunk);
-      res.on('end', () => {
+      res.on('data', function(chunk) { body += chunk; });
+      res.on('end', function() {
         try {
           const response = JSON.parse(body);
-          const textBlock = response.content?.find(block => block.type === 'text');
-          const text = textBlock?.text || '';
+          const textBlock = response.content && response.content.find(function(block) { return block.type === 'text'; });
+          const text = textBlock ? textBlock.text : '';
           const clean = text.replace(/```json|```/g, '').trim();
           const parsed = JSON.parse(clean);
           resolve({
-            title: parsed.title || `${zoneName} in ${month}: What You Need to Know`,
-            body: parsed.body || `Your ${zoneName} market showed strong activity this ${month}.`
+            title: parsed.title || (zoneName + ' in ' + month + ': What You Need to Know'),
+            body: parsed.body || ('Your ' + zoneName + ' market showed strong activity this ' + month + '.')
           });
         } catch (err) {
           console.error('Article parse error:', err, body);
           resolve({
-            title: `${zoneName} in ${month}: What You Need to Know`,
-            body: `Your ${zoneName} market continued to show strong activity this ${month}. Stay tuned for more detailed insights as we gather more data for your specific area.`
+            title: zoneName + ' in ' + month + ': What You Need to Know',
+            body: 'Your ' + zoneName + ' market continued to show strong activity this ' + month + '.'
           });
         }
       });
     });
 
-    req.on('error', (err) => {
+    req.on('error', function(err) {
       console.error('Article generation error:', err);
       resolve({
-        title: `${zoneName} in ${month}: What You Need to Know`,
-        body: `Your ${zoneName} market continued to show strong activity this ${month}. Stay tuned for more detailed insights as we gather more data for your specific area.`
+        title: zoneName + ' in ' + month + ': What You Need to Know',
+        body: 'Your ' + zoneName + ' market continued to show strong activity this ' + month + '.'
       });
     });
 
