@@ -675,7 +675,7 @@ let editAutocomplete = null;
     document.getElementById('edit-phone').value = sub.phone || '';
     document.getElementById('edit-address').value = sub.address || '';
     document.getElementById('editZoneBadge').className = 'zone-badge';
-    editDetectedZoneId = 'checking';
+    editDetectedZoneId = null;
     document.getElementById('editModal').classList.add('open');
     const zoneRecheckInterval = setInterval(async () => {
       if (!document.getElementById('editModal').classList.contains('open')) {
