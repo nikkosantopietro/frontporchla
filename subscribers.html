@@ -33,7 +33,6 @@
   .page-title-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 2.5px; text-transform: uppercase; color: var(--terra); margin-bottom: 6px; }
   .page-title { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--charcoal); letter-spacing: -0.5px; }
   .page-title em { font-style: italic; color: var(--terra); }
-  .header-stats { display: flex; gap: 32px; }
   .header-stat { text-align: right; }
   .header-stat-num { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--charcoal); }
   .header-stat-label { font-size: 11px; color: var(--light); text-transform: uppercase; letter-spacing: 0.8px; }
@@ -83,7 +82,6 @@
   .empty-sub { font-size: 14px; color: var(--light); margin-bottom: 24px; font-weight: 300; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.6; }
   .btn-empty { background: var(--terra); color: white; padding: 12px 28px; border-radius: 100px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
-  /* ADD MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,40,37,0.5); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--warm-white); border-radius: 20px; padding: 40px; width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(44,40,37,0.2); max-height: 90vh; overflow-y: auto; }
@@ -146,23 +144,28 @@
   .note-entry { padding: 10px 12px; background: var(--cream); border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--sand); }
   .note-entry-date { font-size: 10px; color: var(--light); margin-bottom: 4px; }
   .note-entry-text { font-size: 13px; color: var(--charcoal); line-height: 1.5; }
-.score-breakdown-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--sand); }
-.score-breakdown-row:last-of-type { border-bottom: none; }
-.score-breakdown-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--charcoal); }
-.score-breakdown-pts { font-size: 11px; font-weight: 500; color: var(--green); background: var(--green-light); padding: 2px 8px; border-radius: 100px; }
-.score-breakdown-pts.terra { color: #7a3a10; background: #F7E8DC; }
-.score-breakdown-count { font-size: 11px; color: var(--light); }
-.score-total-bar { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: #FEF3DC; border-radius: 8px; margin-top: 10px; font-size: 13px; font-weight: 500; color: #854F0B; }
-.info-i { width: 15px; height: 15px; border-radius: 50%; background: var(--sand); color: var(--mid); font-size: 9px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; cursor: default; position: relative; }
-.info-i .tip { display: none; position: absolute; left: 18px; top: -4px; background: var(--charcoal); color: var(--cream); font-size: 11px; padding: 6px 10px; border-radius: 6px; width: 210px; line-height: 1.5; z-index: 10; font-style: normal; }
-.info-i:hover .tip { display: block; }
-.month-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--light); font-weight: 500; padding: 8px 0 4px; border-bottom: 1px solid var(--sand); margin-bottom: 4px; }
-.click-history-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--cream); }
-.click-history-row:last-child { border-bottom: none; }
-.click-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.click-history-name { flex: 1; font-size: 13px; color: var(--charcoal); }
-.click-history-time { font-size: 11px; color: var(--light); }
-.click-history-pts { font-size: 11px; font-weight: 500; color: var(--green); background: var(--green-light); padding: 2px 8px; border-radius: 100px; white-space: nowrap; }
+
+  /* SCORE BREAKDOWN */
+  .score-breakdown-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--sand); }
+  .score-breakdown-row:last-of-type { border-bottom: none; }
+  .score-breakdown-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--charcoal); }
+  .score-breakdown-pts { font-size: 11px; font-weight: 500; color: var(--green); background: var(--green-light); padding: 2px 8px; border-radius: 100px; }
+  .score-breakdown-pts.terra { color: #7a3a10; background: #F7E8DC; }
+  .score-breakdown-count { font-size: 11px; color: var(--light); }
+  .score-total-bar { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: #FEF3DC; border-radius: 8px; margin-top: 10px; font-size: 13px; font-weight: 500; color: #854F0B; }
+  .info-i { width: 15px; height: 15px; border-radius: 50%; background: var(--sand); color: var(--mid); font-size: 9px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; cursor: default; position: relative; flex-shrink: 0; }
+  .info-i .tip { display: none; position: absolute; left: 18px; top: -4px; background: var(--charcoal); color: var(--cream); font-size: 11px; padding: 6px 10px; border-radius: 6px; width: 210px; line-height: 1.5; z-index: 10; font-style: normal; }
+  .info-i:hover .tip { display: block; }
+
+  /* CLICK HISTORY */
+  .month-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--light); font-weight: 500; padding: 8px 0 4px; border-bottom: 1px solid var(--sand); margin-bottom: 4px; }
+  .click-history-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--cream); }
+  .click-history-row:last-child { border-bottom: none; }
+  .click-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .click-history-name { flex: 1; font-size: 13px; color: var(--charcoal); }
+  .click-history-time { font-size: 11px; color: var(--light); }
+  .click-history-pts { font-size: 11px; font-weight: 500; color: var(--green); background: var(--green-light); padding: 2px 8px; border-radius: 100px; white-space: nowrap; }
+
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--charcoal); color: var(--cream); padding: 12px 24px; border-radius: 100px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
   .toast.visible { opacity: 1; }
   .toast.success { background: var(--green); }
@@ -233,6 +236,7 @@
     </div>
   </div>
 </main>
+
 <!-- EDIT MODAL -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
@@ -260,6 +264,7 @@
     </div>
   </div>
 </div>
+
 <!-- ADD MODAL -->
 <div class="modal-overlay" id="addModal">
   <div class="modal">
@@ -311,17 +316,8 @@
     </div>
   </div>
 
-<div class="profile-section" id="scoreBreakdownSection">
-      <div class="profile-section-label">Score breakdown</div>
-      <div id="scoreBreakdownBody"></div>
-    </div>
-
-    <div class="profile-section" id="clickHistorySection">
-      <div class="profile-section-label">Click history</div>
-      <div id="clickHistoryBody"><div style="font-size:13px;color:var(--light);font-weight:300;">No clicks recorded yet.</div></div>
-    </div>
-  
   <div class="profile-body">
+
     <div class="profile-section">
       <div class="profile-section-label">Engagement</div>
       <div class="engagement-grid">
@@ -336,12 +332,22 @@
       <div class="profile-detail-row"><span class="profile-detail-label">Email</span><span class="profile-detail-value" id="profileEmail">—</span></div>
       <div class="profile-detail-row"><span class="profile-detail-label">Phone</span><span class="profile-detail-value" id="profilePhone">—</span></div>
       <div class="profile-detail-row"><span class="profile-detail-label">Address</span><span class="profile-detail-value" id="profileAddress">—</span></div>
-    <div class="profile-action-row">
+      <div class="profile-action-row">
         <button class="profile-action-btn primary" id="profileEmailBtn">Email</button>
         <button class="profile-action-btn" id="profileCallBtn">Call</button>
         <button class="profile-action-btn" onclick="openEditModal()" style="color:var(--terra);border-color:var(--terra);">Edit</button>
         <button class="profile-action-btn" onclick="deleteCurrentSubscriber()" style="color:#A32D2D;border-color:#F0BABA;">Remove</button>
       </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-label">Score breakdown</div>
+      <div id="scoreBreakdownBody"></div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-label">Click history</div>
+      <div id="clickHistoryBody"><div style="font-size:13px;color:var(--light);font-weight:300;">No clicks recorded yet.</div></div>
     </div>
 
     <div class="profile-section">
@@ -354,6 +360,7 @@
       <div class="profile-section-label">Note history</div>
       <div id="noteHistory"></div>
     </div>
+
   </div>
 </div>
 
@@ -375,6 +382,8 @@
   let detectedZoneId = null;
   let nozoneOnly = false;
   let autocomplete = null;
+  let editAutocomplete = null;
+  let editDetectedZoneId = undefined;
 
   function calcStatus(score) {
     if (score >= 100) return 'onfire';
@@ -433,20 +442,20 @@
     if (!error && data && data.length > 0) {
       detectedZoneId = data[0].zone_id;
       badge.className = 'zone-badge found';
-      badgeText.innerHTML = `<strong>${data[0].zone_name}</strong> — this address is in your zone`;
+      badgeText.innerHTML = '<strong>' + data[0].zone_name + '</strong> — this address is in your zone';
     } else {
       badge.className = 'zone-badge not-found';
       const addrEncoded = encodeURIComponent(document.getElementById('inp-address').value);
-      badgeText.innerHTML = `Outside your zones — <a href="zones.html?lat=${lat}&lng=${lng}&address=${addrEncoded}" target="_blank">create a zone</a> for this area`;
+      badgeText.innerHTML = 'Outside your zones — <a href="zones.html?lat=' + lat + '&lng=' + lng + '&address=' + addrEncoded + '" target="_blank">create a zone</a> for this area';
     }
   }
 
   async function loadSubscribers() {
-   const { data } = await client.from('subscribers')
-  .select('*, zones(name, color)')
-  .eq('agent_id', currentUser.id)
-  .eq('unsubscribed', false)
-  .order('engagement_score', { ascending: false });
+    const { data } = await client.from('subscribers')
+      .select('*, zones(name, color)')
+      .eq('agent_id', currentUser.id)
+      .eq('unsubscribed', false)
+      .order('engagement_score', { ascending: false });
     allSubscribers = data || [];
     renderTable();
     updateCounts();
@@ -467,7 +476,7 @@
     if (unzoned.length > 0) {
       banner.classList.add('visible');
       document.getElementById('nozoneBannerText').textContent =
-        `${unzoned.length} subscriber${unzoned.length > 1 ? 's have' : ' has'} no zone and will be skipped on the next send.`;
+        unzoned.length + ' subscriber' + (unzoned.length > 1 ? 's have' : ' has') + ' no zone and will be skipped on the next send.';
     } else {
       banner.classList.remove('visible');
     }
@@ -528,34 +537,25 @@
       const initials = (sub.first_name[0] + (sub.last_name[0] || '')).toUpperCase();
       const zone = sub.zones;
       const nozoneFlag = !sub.zone_id ? '<span class="nozone-flag">No zone</span>' : '';
-      const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(sub.email || '')}&su=${encodeURIComponent('Checking in — Front Porch LA')}`;
+      const gmailUrl = 'https://mail.google.com/mail/?view=cm&to=' + encodeURIComponent(sub.email || '') + '&su=' + encodeURIComponent('Checking in — Front Porch LA');
 
       const row = document.createElement('tr');
       row.className = 'data-row';
       row.onclick = () => openProfile(sub.id);
-      row.innerHTML = `
-        <td>
-          <div class="cell-name">
-            <div class="cell-avatar">${initials}</div>
-            <div>
-              <div class="cell-name-text">${sub.first_name} ${sub.last_name}${nozoneFlag}</div>
-              <div class="cell-sub">${sub.address || sub.email || '—'}</div>
-            </div>
-          </div>
-        </td>
-        <td>${zone ? `<div class="cell-zone"><div class="cell-zone-dot" style="background:${zone.color}"></div><div class="cell-zone-name">${zone.name}</div></div>` : '<span style="color:var(--light);font-size:12px;">—</span>'}</td>
-        <td><span class="cell-num">${sub.emails_sent || 0}</span></td>
-        <td><span class="cell-num">${sub.total_opens || 0}</span></td>
-        <td><span class="cell-num">${sub.monthly_clicks || 0}</span></td>
-        <td><span class="score-cell ${scoreColorClass(status)}">${score}</span></td>
-        <td><span class="status-pill status-${status}">${statusLabel(status)}</span></td>
-        <td>
-          <div class="cell-actions" onclick="event.stopPropagation()">
-            ${sub.email ? `<button class="action-btn email-btn" onclick="window.open('${gmailUrl}','_blank')">Email</button>` : ''}
-            ${sub.phone ? `<button class="action-btn" onclick="window.location.href='tel:${sub.phone}'">Call</button>` : ''}
-          </div>
-        </td>
-      `;
+      row.innerHTML =
+        '<td><div class="cell-name"><div class="cell-avatar">' + initials + '</div><div>' +
+        '<div class="cell-name-text">' + sub.first_name + ' ' + sub.last_name + nozoneFlag + '</div>' +
+        '<div class="cell-sub">' + (sub.address || sub.email || '—') + '</div></div></div></td>' +
+        '<td>' + (zone ? '<div class="cell-zone"><div class="cell-zone-dot" style="background:' + zone.color + '"></div><div class="cell-zone-name">' + zone.name + '</div></div>' : '<span style="color:var(--light);font-size:12px;">—</span>') + '</td>' +
+        '<td><span class="cell-num">' + (sub.emails_sent || 0) + '</span></td>' +
+        '<td><span class="cell-num">' + (sub.total_opens || 0) + '</span></td>' +
+        '<td><span class="cell-num">' + (sub.monthly_clicks || 0) + '</span></td>' +
+        '<td><span class="score-cell ' + scoreColorClass(status) + '">' + score + '</span></td>' +
+        '<td><span class="status-pill status-' + status + '">' + statusLabel(status) + '</span></td>' +
+        '<td><div class="cell-actions" onclick="event.stopPropagation()">' +
+        (sub.email ? '<button class="action-btn email-btn" onclick="window.open(\'' + gmailUrl + '\',\'_blank\')">Email</button>' : '') +
+        (sub.phone ? '<button class="action-btn" onclick="window.location.href=\'tel:' + sub.phone + '\'">Call</button>' : '') +
+        '</div></td>';
       body.appendChild(row);
     });
   }
@@ -586,13 +586,8 @@
       phone: document.getElementById('inp-phone').value.trim() || null,
       address: document.getElementById('inp-address').value.trim() || null,
       zone_id: detectedZoneId || null,
-      status: 'cold',
-      engagement_score: 0,
-      emails_sent: 0,
-      total_opens: 0,
-      monthly_clicks: 0,
-      notes: notesHistory,
-      agent_id: currentUser.id
+      status: 'cold', engagement_score: 0, emails_sent: 0, total_opens: 0, monthly_clicks: 0,
+      notes: notesHistory, agent_id: currentUser.id
     });
     btn.disabled = false; btn.textContent = 'Add subscriber';
     if (error) { showToast('Error — ' + error.message, 'error'); return; }
@@ -612,11 +607,11 @@
     document.getElementById('profileName').textContent = sub.first_name + ' ' + sub.last_name;
     const zone = sub.zones;
     document.getElementById('profileZone').innerHTML = zone
-      ? `<div style="width:8px;height:8px;border-radius:50%;background:${zone.color};flex-shrink:0;"></div><span style="color:var(--green);font-weight:500;">${zone.name}</span>`
-      : `<span style="color:#A32D2D;font-weight:500;">No zone</span> &nbsp;<a href="zones.html" target="_blank" style="color:#A32D2D;font-size:11px;text-decoration:underline;">Create a zone →</a>`;
+      ? '<div style="width:8px;height:8px;border-radius:50%;background:' + zone.color + ';flex-shrink:0;"></div><span style="color:var(--green);font-weight:500;">' + zone.name + '</span>'
+      : '<span style="color:#A32D2D;font-weight:500;">No zone</span> &nbsp;<a href="zones.html" target="_blank" style="color:#A32D2D;font-size:11px;text-decoration:underline;">Create a zone →</a>';
     document.getElementById('profileScore').textContent = score;
-    document.getElementById('profileScore').className = `profile-score-num ${scoreColorClass(status)}`;
-    document.getElementById('profileStatusPill').innerHTML = `<span class="status-pill status-${status}">${statusLabel(status)}</span>`;
+    document.getElementById('profileScore').className = 'profile-score-num ' + scoreColorClass(status);
+    document.getElementById('profileStatusPill').innerHTML = '<span class="status-pill status-' + status + '">' + statusLabel(status) + '</span>';
     document.getElementById('profSent').textContent = sub.emails_sent || 0;
     document.getElementById('profOpens').textContent = sub.total_opens || 0;
     document.getElementById('profClicks').textContent = sub.monthly_clicks || 0;
@@ -624,7 +619,7 @@
     document.getElementById('profilePhone').textContent = sub.phone || '—';
     document.getElementById('profileAddress').textContent = sub.address || '—';
 
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(sub.email||'')}&su=${encodeURIComponent('Checking in — Front Porch LA')}`;
+    const gmailUrl = 'https://mail.google.com/mail/?view=cm&to=' + encodeURIComponent(sub.email||'') + '&su=' + encodeURIComponent('Checking in — Front Porch LA');
     document.getElementById('profileEmailBtn').onclick = () => window.open(gmailUrl, '_blank');
     document.getElementById('profileCallBtn').onclick = () => { if(sub.phone) window.location.href = 'tel:' + sub.phone; };
 
@@ -632,7 +627,7 @@
     renderNoteHistory(sub.notes);
     renderScoreBreakdown(sub);
     loadClickHistory(sub.id);
-    
+
     document.getElementById('profileOverlay').classList.add('open');
     document.getElementById('profilePanel').classList.add('open');
   }
@@ -650,7 +645,7 @@
       const d = new Date(note.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
       const el = document.createElement('div');
       el.className = 'note-entry';
-      el.innerHTML = `<div class="note-entry-date">${d}</div><div class="note-entry-text">${note.text}</div>`;
+      el.innerHTML = '<div class="note-entry-date">' + d + '</div><div class="note-entry-text">' + note.text + '</div>';
       container.appendChild(el);
     });
   }
@@ -659,53 +654,33 @@
     const score = sub.engagement_score || 0;
     const status = calcStatus(score);
     const opens = sub.total_opens || 0;
-    const clicks = sub.monthly_clicks || 0;
-    
-    const LINK_LABELS = {
-      'capital-gains': 'Capital gains calculator',
-      'home-value': 'How is my home valued?',
-      'home-value-tool': 'Home value page',
-      'listings': 'View listings',
-      'contact': 'Get in touch',
-      'mortgage': 'Mortgage calculator'
-    };
-
-    const LINK_SCORES = {
-      'capital-gains': 25,
-      'home-value': 15,
-      'home-value-tool': 15,
-      'listings': 10,
-      'contact': 20,
-      'mortgage': 15
-    };
-
     const openPts = opens * 5;
     let rows = '';
 
     if (opens > 0) {
-      rows += `<div class="score-breakdown-row">
-        <div class="score-breakdown-left">Email opens</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="score-breakdown-count">${opens} × 5 pts</span>
-          <span class="score-breakdown-pts">+${openPts}</span>
-        </div>
-      </div>`;
+      rows += '<div class="score-breakdown-row">' +
+        '<div class="score-breakdown-left">Email opens</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<span class="score-breakdown-count">' + opens + ' × 5 pts</span>' +
+        '<span class="score-breakdown-pts">+' + openPts + '</span>' +
+        '</div></div>';
     }
 
-    if (sub.clicked_last_month && sub.opened_last_month) {
-      rows += `<div class="score-breakdown-row">
-        <div class="score-breakdown-left">
-          Open streak bonus
-          <span class="info-i">i<span class="tip">Awarded when a subscriber opens emails 2 months in a row — shows consistent interest in the neighborhood.</span></span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="score-breakdown-count">2 mo. streak</span>
-          <span class="score-breakdown-pts">+15</span>
-        </div>
-      </div>`;
+    if (sub.opened_last_month) {
+      rows += '<div class="score-breakdown-row">' +
+        '<div class="score-breakdown-left">Open streak bonus ' +
+        '<span class="info-i">i<span class="tip">Awarded when a subscriber opens emails 2 months in a row — shows consistent interest in the neighborhood.</span></span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<span class="score-breakdown-count">2 mo. streak</span>' +
+        '<span class="score-breakdown-pts">+15</span>' +
+        '</div></div>';
     }
 
-    rows += `<div class="score-total-bar"><span>Total score</span><span>${score} pts · ${statusLabel(status)}</span></div>`;
+    if (score > 0) {
+      rows += '<div class="score-total-bar"><span>Total score</span><span>' + score + ' pts · ' + statusLabel(status) + '</span></div>';
+    }
+
     document.getElementById('scoreBreakdownBody').innerHTML = rows || '<div style="font-size:13px;color:var(--light);">No activity yet.</div>';
   }
 
@@ -734,54 +709,41 @@
     };
 
     const LINK_SCORES = {
-      'capital-gains': 25,
-      'home-value': 15,
-      'home-value-tool': 15,
-      'listings': 10,
-      'contact': 20,
-      'mortgage': 15
+      'capital-gains': 25, 'home-value': 15, 'home-value-tool': 15,
+      'listings': 10, 'contact': 20, 'mortgage': 15
     };
 
     const DOT_COLORS = {
-      'capital-gains': '#993C1D',
-      'home-value': '#B5652A',
-      'home-value-tool': '#B5652A',
-      'contact': '#3D5A47',
-      'listings': '#C4A882',
-      'mortgage': '#6B6058'
+      'capital-gains': '#993C1D', 'home-value': '#B5652A', 'home-value-tool': '#B5652A',
+      'contact': '#3D5A47', 'listings': '#C4A882', 'mortgage': '#6B6058'
     };
 
     const byMonth = {};
     clicks.forEach(c => {
-      const d = new Date(c.created_at);
-      const key = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      const key = new Date(c.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
       if (!byMonth[key]) byMonth[key] = [];
       byMonth[key].push(c);
     });
 
     let html = '';
     Object.keys(byMonth).forEach(month => {
-      html += `<div class="month-group-label">${month}</div>`;
+      html += '<div class="month-group-label">' + month + '</div>';
       byMonth[month].forEach(c => {
         const label = LINK_LABELS[c.link_key] || c.link_key;
         const pts = LINK_SCORES[c.link_key] || 10;
         const dot = DOT_COLORS[c.link_key] || '#9B9088';
         const time = new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' +
           new Date(c.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        html += `<div class="click-history-row">
-          <div class="click-dot" style="background:${dot};"></div>
-          <div>
-            <div class="click-history-name">${label}</div>
-            <div class="click-history-time">${time}</div>
-          </div>
-          <div class="click-history-pts">+${pts} pts</div>
-        </div>`;
+        html += '<div class="click-history-row">' +
+          '<div class="click-dot" style="background:' + dot + ';"></div>' +
+          '<div><div class="click-history-name">' + label + '</div>' +
+          '<div class="click-history-time">' + time + '</div></div>' +
+          '<div class="click-history-pts">+' + pts + ' pts</div></div>';
       });
     });
 
     container.innerHTML = html;
   }
-  
 
   async function saveNote() {
     const text = document.getElementById('newNoteInput').value.trim();
@@ -821,8 +783,6 @@
     t.className = 'toast visible ' + type;
     setTimeout(() => t.className = 'toast', 3000);
   }
-let editAutocomplete = null;
-  let editDetectedZoneId = undefined;
 
   function openEditModal() {
     const sub = allSubscribers.find(s => s.id === selectedSubId);
@@ -835,15 +795,10 @@ let editAutocomplete = null;
     document.getElementById('editZoneBadge').className = 'zone-badge';
     editDetectedZoneId = null;
     document.getElementById('editModal').classList.add('open');
+
     const zoneRecheckInterval = setInterval(async () => {
-      if (!document.getElementById('editModal').classList.contains('open')) {
-        clearInterval(zoneRecheckInterval);
-        return;
-      }
-    if (editDetectedZoneId && editDetectedZoneId !== 'checking' && editDetectedZoneId !== null) {
-        clearInterval(zoneRecheckInterval);
-        return;
-      }
+      if (!document.getElementById('editModal').classList.contains('open')) { clearInterval(zoneRecheckInterval); return; }
+      if (editDetectedZoneId && editDetectedZoneId !== 'checking' && editDetectedZoneId !== null) { clearInterval(zoneRecheckInterval); return; }
       const addr = document.getElementById('edit-address').value.trim();
       if (!addr) return;
       const geocoder = new google.maps.Geocoder();
@@ -852,11 +807,10 @@ let editAutocomplete = null;
         const lat = results[0].geometry.location.lat();
         const lng = results[0].geometry.location.lng();
         const { data, error } = await client.rpc('match_zone_for_point', { lat, lng, agent: currentUser.id });
-        
         if (!error && data && data.length > 0) {
           editDetectedZoneId = data[0].zone_id;
           document.getElementById('editZoneBadge').className = 'zone-badge found';
-          document.getElementById('editZoneBadgeText').innerHTML = `<strong>${data[0].zone_name}</strong> — this address is in your zone`;
+          document.getElementById('editZoneBadgeText').innerHTML = '<strong>' + data[0].zone_name + '</strong> — this address is in your zone';
           clearInterval(zoneRecheckInterval);
         }
       });
@@ -880,14 +834,12 @@ let editAutocomplete = null;
           if (!error && data && data.length > 0) {
             editDetectedZoneId = data[0].zone_id;
             badge.className = 'zone-badge found';
-            badgeText.innerHTML = `<strong>${data[0].zone_name}</strong> — this address is in your zone`;
+            badgeText.innerHTML = '<strong>' + data[0].zone_name + '</strong> — this address is in your zone';
           } else {
             editDetectedZoneId = null;
             badge.className = 'zone-badge not-found';
             const editAddr = encodeURIComponent(document.getElementById('edit-address').value);
-            const editLat = place.geometry.location.lat();
-            const editLng = place.geometry.location.lng();
-            badgeText.innerHTML = `Outside your zones — <a href="zones.html?lat=${editLat}&lng=${editLng}&address=${editAddr}" target="_blank">create a zone</a> for this area`;
+            badgeText.innerHTML = 'Outside your zones — <a href="zones.html?lat=' + lat + '&lng=' + lng + '&address=' + editAddr + '" target="_blank">create a zone</a> for this area';
           }
         });
       }
@@ -903,35 +855,25 @@ let editAutocomplete = null;
     const first = document.getElementById('edit-first').value.trim();
     const last = document.getElementById('edit-last').value.trim();
     if (!first || !last) { showToast('First and last name are required', 'error'); return; }
-
     const btn = document.getElementById('editSubmitBtn');
     btn.disabled = true; btn.textContent = 'Saving...';
-
     const updates = {
-      first_name: first,
-      last_name: last,
+      first_name: first, last_name: last,
       email: document.getElementById('edit-email').value.trim() || null,
       phone: document.getElementById('edit-phone').value.trim() || null,
       address: document.getElementById('edit-address').value.trim() || null,
     };
-
-    if (editDetectedZoneId !== undefined) {
-      updates.zone_id = editDetectedZoneId;
-    } else if (!document.getElementById('edit-address').value.trim()) {
-      updates.zone_id = null;
-    }
-
+    if (editDetectedZoneId !== undefined) { updates.zone_id = editDetectedZoneId; }
+    else if (!document.getElementById('edit-address').value.trim()) { updates.zone_id = null; }
     const { error } = await client.from('subscribers').update(updates).eq('id', selectedSubId);
     btn.disabled = false; btn.textContent = 'Save changes';
-
     if (error) { showToast('Error — ' + error.message, 'error'); return; }
     showToast('Subscriber updated', 'success');
     closeEditModal();
     await loadSubscribers();
-
-    // Refresh profile panel with updated data
     openProfile(selectedSubId);
   }
+
   init();
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAaNEzDIZXk-tSuds24aQljvHSURJ2d2o&libraries=places&callback=initAutocomplete" async defer></script>
