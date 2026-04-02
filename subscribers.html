@@ -655,6 +655,134 @@
     });
   }
 
+  function renderScoreBreakdown(sub) {
+    const score = sub.engagement_score || 0;
+    const status = calcStatus(score);
+    const opens = sub.total_opens || 0;
+    const clicks = sub.monthly_clicks || 0;
+    
+    const LINK_LABELS = {
+      'capital-gains': 'Capital gains calculator',
+      'home-value': 'How is my home valued?',
+      'home-value-tool': 'Home value page',
+      'listings': 'View listings',
+      'contact': 'Get in touch',
+      'mortgage': 'Mortgage calculator'
+    };
+
+    const LINK_SCORES = {
+      'capital-gains': 25,
+      'home-value': 15,
+      'home-value-tool': 15,
+      'listings': 10,
+      'contact': 20,
+      'mortgage': 15
+    };
+
+    const openPts = opens * 5;
+    let rows = '';
+
+    if (opens > 0) {
+      rows += `<div class="score-breakdown-row">
+        <div class="score-breakdown-left">Email opens</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="score-breakdown-count">${opens} × 5 pts</span>
+          <span class="score-breakdown-pts">+${openPts}</span>
+        </div>
+      </div>`;
+    }
+
+    if (sub.clicked_last_month && sub.opened_last_month) {
+      rows += `<div class="score-breakdown-row">
+        <div class="score-breakdown-left">
+          Open streak bonus
+          <span class="info-i">i<span class="tip">Awarded when a subscriber opens emails 2 months in a row — shows consistent interest in the neighborhood.</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="score-breakdown-count">2 mo. streak</span>
+          <span class="score-breakdown-pts">+15</span>
+        </div>
+      </div>`;
+    }
+
+    rows += `<div class="score-total-bar"><span>Total score</span><span>${score} pts · ${statusLabel(status)}</span></div>`;
+    document.getElementById('scoreBreakdownBody').innerHTML = rows || '<div style="font-size:13px;color:var(--light);">No activity yet.</div>';
+  }
+
+  async function loadClickHistory(subscriberId) {
+    const container = document.getElementById('clickHistoryBody');
+    container.innerHTML = '<div style="font-size:13px;color:var(--light);">Loading...</div>';
+
+    const { data: clicks, error } = await client
+      .from('link_clicks')
+      .select('link_key, destination, created_at')
+      .eq('subscriber_id', subscriberId)
+      .order('created_at', { ascending: false });
+
+    if (error || !clicks || clicks.length === 0) {
+      container.innerHTML = '<div style="font-size:13px;color:var(--light);font-weight:300;">No clicks recorded yet.</div>';
+      return;
+    }
+
+    const LINK_LABELS = {
+      'capital-gains': 'Capital gains calculator',
+      'home-value': 'How is my home valued?',
+      'home-value-tool': 'Home value page',
+      'listings': 'View listings',
+      'contact': 'Get in touch',
+      'mortgage': 'Mortgage calculator'
+    };
+
+    const LINK_SCORES = {
+      'capital-gains': 25,
+      'home-value': 15,
+      'home-value-tool': 15,
+      'listings': 10,
+      'contact': 20,
+      'mortgage': 15
+    };
+
+    const DOT_COLORS = {
+      'capital-gains': '#993C1D',
+      'home-value': '#B5652A',
+      'home-value-tool': '#B5652A',
+      'contact': '#3D5A47',
+      'listings': '#C4A882',
+      'mortgage': '#6B6058'
+    };
+
+    const byMonth = {};
+    clicks.forEach(c => {
+      const d = new Date(c.created_at);
+      const key = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      if (!byMonth[key]) byMonth[key] = [];
+      byMonth[key].push(c);
+    });
+
+    let html = '';
+    Object.keys(byMonth).forEach(month => {
+      html += `<div class="month-group-label">${month}</div>`;
+      byMonth[month].forEach(c => {
+        const label = LINK_LABELS[c.link_key] || c.link_key;
+        const pts = LINK_SCORES[c.link_key] || 10;
+        const dot = DOT_COLORS[c.link_key] || '#9B9088';
+        const time = new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' +
+          new Date(c.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        html += `<div class="click-history-row">
+          <div class="click-dot" style="background:${dot};"></div>
+          <div>
+            <div class="click-history-name">${label}</div>
+            <div class="click-history-time">${time}</div>
+          </div>
+          <div class="click-history-pts">+${pts} pts</div>
+        </div>`;
+      });
+    });
+
+    container.innerHTML = html;
+  }
+  
+
   async function saveNote() {
     const text = document.getElementById('newNoteInput').value.trim();
     if (!text || !selectedSubId) return;
