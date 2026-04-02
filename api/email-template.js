@@ -231,7 +231,7 @@ module.exports = function generateEmail(data) {
     <!-- CTA -->
     <tr><td style="padding:32px 40px;text-align:center;background:#f2f7ee;">
       <p style="margin:0 0 18px;font-size:15px;color:#4a6741;font-style:italic;line-height:1.7;font-family:Georgia,serif;">Thinking about what your home is worth, or just curious what's out there?<br>I'm always happy to talk — no pressure, just a good conversation.</p>
-      <a href="${contactUrl}" style="display:inline-block;background:#4a6741;color:#f5f9f2;padding:12px 28px;border-radius:4px;font-size:13px;letter-spacing:1px;font-family:Arial,sans-serif;text-decoration:none;">Get in touch with ${agentName.split(' ')[0]} →</a>
+      <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=contact&dest=${encodeURIComponent(contactUrl)}" style="display:inline-block;background:#4a6741;color:#f5f9f2;padding:12px 28px;border-radius:4px;font-size:13px;letter-spacing:1px;font-family:Arial,sans-serif;text-decoration:none;">Get in touch with ${agentName.split(' ')[0]} →</a>
     </td></tr>
 
     <!-- GREEN STRIPE -->
