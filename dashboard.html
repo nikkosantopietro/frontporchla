@@ -405,7 +405,32 @@
     await client.auth.signOut();
     window.location.href = 'login.html';
   }
-
+async function triggerMonthlySend() {
+    const btn = document.getElementById('monthlyBtn');
+    const status = document.getElementById('monthlyStatus');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    status.textContent = '';
+    try {
+      const res = await fetch('https://project-zdwup.vercel.app/api/monthly-send', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer frontporchla2026sendmonthly' }
+      });
+      const data = await res.json();
+      if (data.success) {
+        status.style.color = '#3D5A47';
+        status.textContent = `✓ Sent ${data.sent} emails. Skipped ${data.skipped}.`;
+      } else {
+        status.style.color = '#A32D2D';
+        status.textContent = 'Error: ' + (data.error || 'Unknown error');
+      }
+    } catch (err) {
+      status.style.color = '#A32D2D';
+      status.textContent = 'Something went wrong.';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Send monthly reports now →';
+  }
   async function sendTestEmail() {
     const to = document.getElementById('testTo').value;
     const zone = document.getElementById('testZone').value;
