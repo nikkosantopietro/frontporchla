@@ -127,8 +127,7 @@ module.exports = async function handler(req, res) {
   <tr>
     <td style="padding:24px 32px;border-bottom:1px solid #e8ddd0;">
       <p style="margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#9b9088;">Resubscribe link · send via text or email</p>
-      <p style="margin:0 0 12px;font-size:13px;color:#3d5a47;font-family:'Courier New',monospace;word-break:break-all;">${resubscribeLink}</p>
-      <a href="${resubscribeLink}" style="display:inline-block;background:#f2f7ee;border:1px solid #d4e8c8;border-radius:100px;padding:8px 18px;font-size:12px;color:#3d5a47;text-decoration:none;">Copy resubscribe link</a>
+      <p style="margin:0;font-size:13px;color:#3d5a47;font-family:'Courier New',monospace;word-break:break-all;">${resubscribeLink}</p>
     </td>
   </tr>
 
