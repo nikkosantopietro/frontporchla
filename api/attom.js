@@ -128,7 +128,7 @@ function formatCurrency(num) {
 
 function getLastMonthStart() {
   const d = new Date();
-  d.setMonth(d.getMonth() - 1);
+  d.setMonth(d.getMonth() - 3);
   d.setDate(1);
   return d.toISOString().split('T')[0];
 }
