@@ -311,7 +311,35 @@
     note += 'California taxes capital gains as ordinary income at up to 13.3%. Federal rates shown are for capital gains, not ordinary income. This is an estimate only.';
     document.getElementById('resultsNote').textContent = note;
   }
+async function loadAgentContact() {
+    const params = new URLSearchParams(window.location.search);
+    const agentId = params.get('agent');
+    if (!agentId) return;
 
+    const { createClient } = supabase;
+    const client = createClient(
+      'https://gykkvpfbyjllomthdlmw.supabase.co',
+      'sb_publishable_bOBUK_TtANfu365rkKlj1w_wHuMWT-y'
+    );
+
+    const { data } = await client
+      .from('agents')
+      .select('full_name, reply_to_email, email')
+      .eq('id', agentId)
+      .single();
+
+    if (!data) return;
+
+    const agentEmail = data.reply_to_email || data.email;
+    const agentName = data.full_name || 'your agent';
+    const firstName = agentName.split(' ')[0];
+
+    document.querySelector('.cta-btn').href = `mailto:${agentEmail}?subject=Capital Gains Question`;
+    document.querySelector('.cta-btn').textContent = `Talk to ${firstName} →`;
+    document.querySelector('.cta-title').textContent = `Want to understand your full picture?`;
+  }
+
+  loadAgentContact();
   // Google Maps autocomplete for address
   function initAutocomplete() {
     if (!window.google) return;
