@@ -416,10 +416,11 @@
   }
 
   async function loadSubscribers() {
-    const { data } = await client.from('subscribers')
-      .select('*, zones(name, color)')
-      .eq('agent_id', currentUser.id)
-      .order('engagement_score', { ascending: false });
+   const { data } = await client.from('subscribers')
+  .select('*, zones(name, color)')
+  .eq('agent_id', currentUser.id)
+  .eq('unsubscribed', false)
+  .order('engagement_score', { ascending: false });
     allSubscribers = data || [];
     renderTable();
     updateCounts();
