@@ -15,17 +15,20 @@ async function getAVM(address) {
       address2: parts.cityStateZip
     });
 
-    const res = await fetch(`${ATTOM_BASE}/avm/detail?${params}`, {
+    console.log('ATTOM AVM request - address1:', parts.street, 'address2:', parts.cityStateZip);
+
+    const res = await fetch(`${ATTOM_BASE}/avm/snapshot?${params}`, {
       headers: headers()
     });
 
-  if (!res.ok) {
+    if (!res.ok) {
       const errText = await res.text();
       console.error('ATTOM AVM error:', res.status, errText.substring(0, 300));
       return null;
     }
-  const data = await res.json();
-    console.log('ATTOM AVM data:', JSON.stringify(data).substring(0, 300));
+
+    const data = await res.json();
+    console.log('ATTOM AVM data:', JSON.stringify(data).substring(0, 400));
     const property = data?.property?.[0];
     if (!property) return null;
 
@@ -57,14 +60,15 @@ async function getMarketStats(zip) {
       headers: headers()
     });
 
-   if (!res.ok) {
+    if (!res.ok) {
       const errText = await res.text();
       console.error('ATTOM Sales error:', res.status, errText.substring(0, 300));
       return null;
     }
-    const data = await res.json();
-    console.log('ATTOM Sales data:', JSON.stringify(data).substring(0, 300));
-    const sales = data?.property || [];
+
+    const salesData = await res.json();
+    console.log('ATTOM Sales data:', JSON.stringify(salesData).substring(0, 300));
+    const sales = salesData?.property || [];
     if (sales.length === 0) return null;
 
     const prices = sales
@@ -100,7 +104,8 @@ async function getMarketStats(zip) {
 
 function parseAddress(fullAddress) {
   if (!fullAddress) return null;
-  const parts = fullAddress.split(',');
+  const cleaned = fullAddress.replace(/,?\s*USA\s*$/i, '').trim();
+  const parts = cleaned.split(',');
   if (parts.length < 2) return null;
   const street = parts[0].trim();
   const cityStateZip = parts.slice(1).join(',').trim();
