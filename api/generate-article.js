@@ -30,22 +30,14 @@ async function generateArticle(zoneName, marketStats, month, year) {
     '- Only reference things you actually found — never invent names, prices, or details\n' +
     '- Do not mention the agent by name\n' +
     '- Do not use the phrase pull up a chair\n\n' +
-    'Respond in JSON format only with two fields:\n' +
-    '{\n' +
-    '  "title": "a specific, compelling 8-12 word headline — reference something real if you found it",\n' +
-    '  "body": "the full article text"\n' +
-    '}';
+    'Respond in JSON format only, with no markdown, no backticks, no explanation — just the raw JSON object with two fields:\n' +
+    '{ "title": "a specific compelling headline", "body": "the full article text" }';
 
   return new Promise(function(resolve) {
     const data = JSON.stringify({
       model: 'claude-opus-4-5',
       max_tokens: 1024,
-      tools: [
-        {
-          type: 'web_search_20250305',
-          name: 'web_search'
-        }
-      ],
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
       messages: [{ role: 'user', content: prompt }]
     });
 
@@ -68,17 +60,19 @@ async function generateArticle(zoneName, marketStats, month, year) {
       res.on('end', function() {
         try {
           const response = JSON.parse(body);
-          const textBlock = response.content && response.content.find(function(block) { return block.type === 'text'; });
+          const textBlock = response.content && response.content.find(function(block) {
+            return block.type === 'text';
+          });
           const text = textBlock ? textBlock.text : '';
-          const jsonMatch = text.match(/\{[\s\S]*"title"[\s\S]*"body"[\s\S]*\}/);
-if (!jsonMatch) throw new Error('No JSON found in response');
-const parsed = JSON.parse(jsonMatch[0]);
+          const jsonMatch = text.match(/\{[\s\S]*?"title"[\s\S]*?"body"[\s\S]*?\}/);
+          if (!jsonMatch) throw new Error('No JSON found: ' + text.substring(0, 200));
+          const parsed = JSON.parse(jsonMatch[0]);
           resolve({
             title: parsed.title || (zoneName + ' in ' + month + ': What You Need to Know'),
             body: parsed.body || ('Your ' + zoneName + ' market showed strong activity this ' + month + '.')
           });
         } catch (err) {
-          console.error('Article parse error:', err, body);
+          console.error('Article parse error:', err.message);
           resolve({
             title: zoneName + ' in ' + month + ': What You Need to Know',
             body: 'Your ' + zoneName + ' market continued to show strong activity this ' + month + '.'
