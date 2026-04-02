@@ -179,9 +179,14 @@ module.exports = function generateEmail(data) {
               <tr>
                 <td style="vertical-align:middle;">
                   <p style="margin:0 0 5px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#b8d4a8;font-family:Arial,sans-serif;">ATTOM Estimate &nbsp;·&nbsp; ${address}</p>
-                  <p style="margin:0;font-size:27px;color:#f5f9f2;font-family:Arial,sans-serif;font-weight:bold;text-decoration:underline;text-underline-offset:3px;">${avmEstimate}</p>
-                  <p style="margin:3px 0 0;font-size:11px;color:#8ab87a;font-family:Arial,sans-serif;">Range: ${avmLow} – ${avmHigh}</p>
-                  <p style="margin:6px 0 0;font-size:10px;color:#8ab87a;font-family:Arial,sans-serif;font-style:italic;">How is this calculated? →</p>
+                 ${avmEstimate && avmEstimate !== 'N/A' ? `
+        <p style="margin:0;font-size:27px;color:#f5f9f2;font-family:Arial,sans-serif;font-weight:bold;text-decoration:underline;text-underline-offset:3px;">${avmEstimate}</p>
+        <p style="margin:3px 0 0;font-size:11px;color:#8ab87a;font-family:Arial,sans-serif;">Range: ${avmLow} – ${avmHigh}</p>
+        <p style="margin:6px 0 0;font-size:10px;color:#8ab87a;font-family:Arial,sans-serif;font-style:italic;">How is this calculated? →</p>
+        ` : `
+        <p style="margin:0;font-size:16px;color:#f5f9f2;font-family:Georgia,serif;font-style:italic;line-height:1.5;">Want to know what your home is worth?</p>
+        <p style="margin:8px 0 0;font-size:13px;color:#8ab87a;font-family:Arial,sans-serif;">I'll give you a free, in-person home valuation — it takes about 15 minutes and there's no obligation.</p>
+        `}
                 </td>
                 <td style="text-align:right;vertical-align:middle;padding-left:16px;">
                   <p style="margin:0;font-size:16px;color:#7ecb9a;font-family:Arial,sans-serif;font-weight:bold;">${avmChange}</p>
