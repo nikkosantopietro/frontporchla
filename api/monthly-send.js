@@ -2,6 +2,7 @@ const { createClient } = require('@supabase/supabase-js');
 const sgMail = require('@sendgrid/mail');
 const generateEmail = require('./email-template');
 const { getAVM, getMarketStats, getZipFromAddress } = require('./attom');
+const { generateArticle } = require('./generate-article');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -13,8 +14,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 module.exports = async (req, res) => {
-  // Allow manual trigger with secret or cron
-const authHeader = req.headers['authorization'];
+  const authHeader = req.headers['authorization'];
   const cronSecret = process.env.CRON_SECRET;
   if (authHeader !== `Bearer ${cronSecret}`) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -33,7 +33,6 @@ const authHeader = req.headers['authorization'];
   const year = now.getFullYear().toString();
 
   try {
-    // Get all agents
     const { data: agents, error: agentError } = await supabase
       .from('agents')
       .select('*');
@@ -46,26 +45,23 @@ const authHeader = req.headers['authorization'];
     let totalSkipped = 0;
 
     for (const agent of agents) {
-      // Get all subscribers for this agent with a zone
       const { data: subscribers } = await supabase
         .from('subscribers')
         .select('*, zones(name, color)')
-      .eq('agent_id', agent.id)
-.eq('unsubscribed', false)
-.not('zone_id', 'is', null)
-.not('email', 'is', null)
+        .eq('agent_id', agent.id)
+        .eq('unsubscribed', false)
+        .not('zone_id', 'is', null)
+        .not('email', 'is', null);
 
       if (!subscribers || subscribers.length === 0) continue;
 
-      // Get subscribers without a zone (for skip notification)
       const { data: unzoned } = await supabase
         .from('subscribers')
         .select('id')
         .eq('agent_id', agent.id)
-.eq('unsubscribed', false)
-.is('zone_id', null)
+        .eq('unsubscribed', false)
+        .is('zone_id', null);
 
-      // Group subscribers by zone
       const byZone = {};
       for (const sub of subscribers) {
         const zoneId = sub.zone_id;
@@ -78,19 +74,22 @@ const authHeader = req.headers['authorization'];
         byZone[zoneId].subscribers.push(sub);
       }
 
-      // For each zone, fetch market stats once
       for (const zoneId of Object.keys(byZone)) {
         const { zone, subscribers: zoneSubs } = byZone[zoneId];
 
-        // Get market stats from first subscriber's zip
         const sampleAddress = zoneSubs[0]?.address;
         const zip = getZipFromAddress(sampleAddress);
         const marketStats = zip ? await getMarketStats(zip) : null;
 
-        // Send to each subscriber in zone
+        const article = await generateArticle(
+          zone?.name || 'Your Neighborhood',
+          marketStats || {},
+          month,
+          year
+        );
+
         for (const sub of zoneSubs) {
           try {
-            // Get AVM for this subscriber's specific address
             const avm = sub.address ? await getAVM(sub.address) : null;
 
             const templateData = {
@@ -118,12 +117,12 @@ const authHeader = req.headers['authorization'];
               avmLow: avm?.low ? formatCurrency(avm.low) : 'N/A',
               avmHigh: avm?.high ? formatCurrency(avm.high) : 'N/A',
               avmChange: avm?.change ? (avm.change > 0 ? '↑ ' : '↓ ') + formatCurrency(Math.abs(avm.change)) : '—',
-              articleTitle: `${zone?.name || 'Your Neighborhood'} in ${month}: What You Need to Know`,
-              articleBody: `Your ${zone?.name || 'neighborhood'} market continued to show strong activity this ${month}. Stay tuned for more detailed insights as we gather more data for your specific area.`,
+              articleTitle: article.title,
+              articleBody: article.body,
               listingsUrl: 'https://frontporchla.com',
               homeValueUrl: 'https://frontporchla.com/home-value.html',
               contactUrl: `mailto:${agent.reply_to_email || agent.email}`,
-              unsubscribeUrl: `https://frontporchla.com/unsubscribe.html?email=${encodeURIComponent(sub.email)}`,
+              unsubscribeUrl: `https://frontporchla.com/unsubscribe?email=${encodeURIComponent(sub.email)}`,
               agentId: agent.id,
             };
 
@@ -137,7 +136,6 @@ const authHeader = req.headers['authorization'];
               html,
             });
 
-            // Update subscriber stats
             await supabase
               .from('subscribers')
               .update({
@@ -150,8 +148,6 @@ const authHeader = req.headers['authorization'];
               .eq('id', sub.id);
 
             totalSent++;
-
-            // Small delay to avoid rate limiting
             await new Promise(r => setTimeout(r, 100));
 
           } catch (err) {
@@ -161,7 +157,6 @@ const authHeader = req.headers['authorization'];
         }
       }
 
-      // Send confirmation email to agent
       const skippedCount = unzoned?.length || 0;
       await sendAgentConfirmation(agent, totalSent, skippedCount, month, year);
     }
@@ -191,8 +186,8 @@ async function sendAgentConfirmation(agent, sent, skipped, month, year) {
           <tr><td style="padding:8px 0;font-size:13px;color:#9b9088;border-bottom:1px solid #e8ddd0;">Emails sent</td><td style="padding:8px 0;font-size:13px;font-weight:500;color:#2c2825;text-align:right;border-bottom:1px solid #e8ddd0;">${sent}</td></tr>
           <tr><td style="padding:8px 0;font-size:13px;color:#9b9088;">Skipped (no zone)</td><td style="padding:8px 0;font-size:13px;font-weight:500;color:${skipped > 0 ? '#854F0B' : '#2c2825'};text-align:right;">${skipped}</td></tr>
         </table>
-        ${skipped > 0 ? `<div style="background:#fef3dc;border-radius:8px;padding:14px;margin-bottom:16px;"><p style="margin:0;font-size:13px;color:#854F0B;">⚠️ ${skipped} subscriber${skipped > 1 ? 's were' : ' was'} skipped because their address isn't covered by any of your zones. <a href="https://frontporchla.com/zones.html" style="color:#854F0B;font-weight:600;">Draw a zone →</a></p></div>` : ''}
-        <a href="https://frontporchla.com/subscribers.html" style="display:block;text-align:center;background:#3d5a47;color:white;padding:12px;border-radius:100px;font-size:13px;text-decoration:none;">View your subscribers →</a>
+        ${skipped > 0 ? `<div style="background:#fef3dc;border-radius:8px;padding:14px;margin-bottom:16px;"><p style="margin:0;font-size:13px;color:#854F0B;">⚠️ ${skipped} subscriber${skipped > 1 ? 's were' : ' was'} skipped because their address isn't covered by any of your zones. <a href="https://frontporchla.com/zones" style="color:#854F0B;font-weight:600;">Draw a zone →</a></p></div>` : ''}
+        <a href="https://frontporchla.com/subscribers" style="display:block;text-align:center;background:#3d5a47;color:white;padding:12px;border-radius:100px;font-size:13px;text-decoration:none;">View your subscribers →</a>
       </div>
     </div>
   `;
