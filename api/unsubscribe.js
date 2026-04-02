@@ -1,5 +1,67 @@
-const html = `
-<!DOCTYPE html>
+const { createClient } = require('@supabase/supabase-js');
+const sgMail = require('@sendgrid/mail');
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Missing email' });
+
+  try {
+    const { data: subscriber, error: fetchError } = await supabase
+      .from('subscribers')
+      .select('*, zones(name)')
+      .eq('email', email)
+      .single();
+
+    if (fetchError || !subscriber) {
+      return res.status(404).json({ error: 'Subscriber not found' });
+    }
+
+    await supabase
+      .from('subscribers')
+      .update({
+        unsubscribed: true,
+        unsubscribed_at: new Date().toISOString()
+      })
+      .eq('email', email);
+
+    const { data: agent } = await supabase
+      .from('agents')
+      .select('full_name, reply_to_email, initials')
+      .eq('id', subscriber.agent_id)
+      .single();
+
+    const agentFirstName = agent?.full_name?.split(' ')[0] || 'there';
+    const agentEmail = agent?.reply_to_email || 'nikkosantopietro@gmail.com';
+    const subscriberName = `${subscriber.first_name} ${subscriber.last_name}`;
+    const zoneName = subscriber.zones?.name || 'Unknown Zone';
+    const resubscribeLink = `https://frontporchla.com/resubscribe?email=${encodeURIComponent(email)}`;
+
+    const notesHtml = Array.isArray(subscriber.notes) && subscriber.notes.length > 0
+      ? `
+        <tr>
+          <td style="padding:24px 32px;border-bottom:1px solid #e8ddd0;background:#fafcf8;">
+            <p style="margin:0 0 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#9b9088;">Your notes</p>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              ${subscriber.notes.map(n => `
+              <tr>
+                <td style="padding:6px 0;font-size:12px;color:#9b9088;vertical-align:top;width:110px;border-bottom:1px solid #f0ece8;">${new Date(n.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                <td style="padding:6px 0;font-size:13px;color:#2c2825;line-height:1.5;border-bottom:1px solid #f0ece8;">${n.text}</td>
+              </tr>`).join('')}
+            </table>
+          </td>
+        </tr>`
+      : '';
+
+    const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
 <body style="margin:0;padding:0;background:#f0f4ee;font-family:Arial,sans-serif;">
@@ -53,20 +115,7 @@ const html = `
     </td>
   </tr>
 
-  ${subscriber.notes && subscriber.notes.length > 0 ? `
-  <tr>
-    <td style="padding:24px 32px;border-bottom:1px solid #e8ddd0;background:#fafcf8;">
-      <p style="margin:0 0 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#9b9088;">Your notes</p>
-      <table width="100%" cellpadding="0" cellspacing="0">
-        ${subscriber.notes.map(n => `
-        <tr>
-          <td style="padding:6px 0;font-size:12px;color:#9b9088;vertical-align:top;width:110px;border-bottom:1px solid #f0ece8;">${new Date(n.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-          <td style="padding:6px 0;font-size:13px;color:#2c2825;line-height:1.5;border-bottom:1px solid #f0ece8;">${n.text}</td>
-        </tr>`).join('')}
-      </table>
-    </td>
-  </tr>
-  ` : ''}
+  ${notesHtml}
 
   <tr>
     <td style="padding:24px 32px;border-bottom:1px solid #e8ddd0;background:#fafcf8;">
@@ -111,3 +160,26 @@ const html = `
 </table>
 </body>
 </html>`;
+
+    await sgMail.send({
+      to: agentEmail,
+      from: { email: 'monthly@frontporchla.com', name: 'Front Porch LA' },
+      replyTo: agentEmail,
+      subject: `${subscriberName} unsubscribed · ${zoneName}`,
+      html
+    });
+
+    return res.status(200).json({ success: true });
+
+  } catch (err) {
+    console.error('Unsubscribe error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+
+function getStatus(score) {
+  if (!score || score <= 20) return 'Cold';
+  if (score <= 50) return 'Warm';
+  if (score <= 99) return 'Hot';
+  return 'On Fire';
+}
