@@ -694,7 +694,7 @@ let editAutocomplete = null;
         const lat = results[0].geometry.location.lat();
         const lng = results[0].geometry.location.lng();
         const { data, error } = await client.rpc('match_zone_for_point', { lat, lng, agent: currentUser.id });
-        console.log('Zone recheck result:', data, error);
+        console.log('Zone recheck result:', data, error, 'coords:', lat, lng);
         if (!error && data && data.length > 0) {
           editDetectedZoneId = data[0].zone_id;
           document.getElementById('editZoneBadge').className = 'zone-badge found';
