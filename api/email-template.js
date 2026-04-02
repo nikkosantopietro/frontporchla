@@ -162,7 +162,7 @@ module.exports = function generateEmail(data) {
                 <p style="margin:0;font-size:19px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">${activeListings}</p>
                 <p style="margin:3px 0 2px;font-size:9px;color:#6a8f5e;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:.7px;">Active listings</p>
                 <p style="margin:0;font-size:10px;color:#a33d2d;font-family:Arial,sans-serif;">${activeListingsChange}</p>
-                <a href="${listingsUrl}" style="font-size:10px;color:#4a6741;font-family:Arial,sans-serif;display:block;margin-top:3px;">View listings →</a>
+                <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=listings&dest=${encodeURIComponent(listingsUrl)}" style="font-size:10px;color:#4a6741;font-family:Arial,sans-serif;display:block;margin-top:3px;">View listings →</a>
               </td></tr>
             </table>
           </td>
