@@ -206,6 +206,27 @@ module.exports = function generateEmail(data) {
       <p style="margin:0;font-size:14px;line-height:1.8;color:#5f5e5a;font-family:Georgia,serif;">${articleBody}</p>
     </td></tr>
 
+<!-- TOOLS ROW -->
+    <tr><td style="padding:20px 40px;border-bottom:1px solid #d4e8c8;background:#f2f7ee;">
+      <p style="margin:0 0 12px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a6741;font-family:Arial,sans-serif;">Homeowner tools</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="50%" style="padding-right:8px;">
+            <a href="https://frontporchla.com/capital-gains.html" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:14px 16px;text-decoration:none;">
+              <p style="margin:0 0 4px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">💰 Capital Gains Calculator</p>
+              <p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Estimate your tax exposure before you sell</p>
+            </a>
+          </td>
+          <td width="50%" style="padding-left:8px;">
+            <a href="${homeValueUrl}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:14px 16px;text-decoration:none;">
+              <p style="margin:0 0 4px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">🏡 How Is My Home Valued?</p>
+              <p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Understand your ATTOM estimate</p>
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+
     <!-- CTA -->
     <tr><td style="padding:32px 40px;text-align:center;background:#f2f7ee;">
       <p style="margin:0 0 18px;font-size:15px;color:#4a6741;font-style:italic;line-height:1.7;font-family:Georgia,serif;">Thinking about what your home is worth, or just curious what's out there?<br>I'm always happy to talk — no pressure, just a good conversation.</p>
