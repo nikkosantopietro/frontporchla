@@ -677,8 +677,9 @@ let editAutocomplete = null;
     document.getElementById('editZoneBadge').className = 'zone-badge';
     editDetectedZoneId = undefined;
     document.getElementById('editModal').classList.add('open');
-    window.addEventListener('focus', async function recheckZone() {
-      window.removeEventListener('focus', recheckZone);
+    document.addEventListener('visibilitychange', async function recheckZone() {
+      if (document.hidden) return;
+      document.removeEventListener('visibilitychange', recheckZone);
       const addr = document.getElementById('edit-address').value.trim();
       if (!addr) return;
       const geocoder = new google.maps.Geocoder();
