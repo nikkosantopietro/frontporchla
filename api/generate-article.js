@@ -70,8 +70,9 @@ async function generateArticle(zoneName, marketStats, month, year) {
           const response = JSON.parse(body);
           const textBlock = response.content && response.content.find(function(block) { return block.type === 'text'; });
           const text = textBlock ? textBlock.text : '';
-          const clean = text.replace(/```json|```/g, '').trim();
-          const parsed = JSON.parse(clean);
+          const jsonMatch = text.match(/\{[\s\S]*"title"[\s\S]*"body"[\s\S]*\}/);
+if (!jsonMatch) throw new Error('No JSON found in response');
+const parsed = JSON.parse(jsonMatch[0]);
           resolve({
             title: parsed.title || (zoneName + ' in ' + month + ': What You Need to Know'),
             body: parsed.body || ('Your ' + zoneName + ' market showed strong activity this ' + month + '.')
