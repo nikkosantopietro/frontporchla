@@ -122,6 +122,7 @@ const authHeader = req.headers['authorization'];
               homeValueUrl: 'https://frontporchla.com/home-value.html',
               contactUrl: `mailto:${agent.reply_to_email || agent.email}`,
               unsubscribeUrl: 'https://frontporchla.com/unsubscribe.html',
+              agentId: agent.id,
             };
 
             const html = generateEmail(templateData);
