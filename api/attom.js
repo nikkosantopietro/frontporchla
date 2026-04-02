@@ -19,12 +19,13 @@ async function getAVM(address) {
       headers: headers()
     });
 
-    const responseText = await res.text();
-    console.log('ATTOM AVM response:', res.status, responseText.substring(0, 500));
-    if (!res.ok) {
+  if (!res.ok) {
+      const errText = await res.text();
+      console.error('ATTOM AVM error:', res.status, errText.substring(0, 300));
       return null;
     }
-    const data = JSON.parse(responseText);
+    const data = await res.json();
+    console.log('ATTOM AVM data:', JSON.stringify(data).substring(0, 300));
 
     const data = await res.json();
     const property = data?.property?.[0];
