@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capital Gains Calculator — Front Porch LA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF7; --sand: #E8DDD0;
+    --clay: #C4A882; --terra: #B5652A; --charcoal: #2C2825;
+    --mid: #6B6058; --light: #9B9088; --green: #3D5A47; --green-light: #EBF0EC;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; }
+
+  .header { background: #4a6741; padding: 28px 40px; text-align: center; }
+  .header-logo { font-size: 10px; letter-spacing: 3px; color: #b8d4a8; text-transform: uppercase; font-family: Arial, sans-serif; margin-bottom: 6px; }
+  .header-title { font-size: 28px; color: #f5f9f2; font-weight: normal; font-family: 'Playfair Display', serif; }
+  .header-sub { font-size: 12px; color: #b8d4a8; letter-spacing: 1px; font-family: Arial, sans-serif; margin-top: 4px; }
+  .stripe { height: 3px; background: #8ab87a; }
+
+  .container { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+
+  .card { background: var(--warm-white); border: 1px solid var(--sand); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--charcoal); margin-bottom: 6px; }
+  .card-sub { font-size: 13px; color: var(--light); margin-bottom: 24px; line-height: 1.6; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--mid); margin-bottom: 6px; font-weight: 500; }
+  .form-input { width: 100%; padding: 11px 14px; background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--charcoal); outline: none; transition: border-color 0.2s; }
+  .form-input:focus { border-color: #4a6741; }
+  .form-select { width: 100%; padding: 11px 14px; background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--charcoal); outline: none; cursor: pointer; }
+
+  .address-row { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 16px; }
+  .address-row .form-group { flex: 1; margin-bottom: 0; }
+
+  .misconception { background: #f2f7ee; border: 1px solid #d4e8c8; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; }
+  .misconception-title { font-size: 13px; font-weight: 500; color: #1e3318; margin-bottom: 8px; font-family: 'DM Sans', sans-serif; }
+  .misconception-body { font-size: 13px; color: #4a6741; line-height: 1.7; font-family: 'DM Sans', sans-serif; }
+  .misconception-body strong { color: #1e3318; }
+
+  .results { background: #1e3318; border-radius: 12px; padding: 28px; margin-top: 8px; display: none; }
+  .results.visible { display: block; }
+  .results-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #b8d4a8; font-family: Arial, sans-serif; margin-bottom: 20px; }
+  .results-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+  .result-box { background: rgba(255,255,255,0.07); border-radius: 8px; padding: 14px; }
+  .result-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #8ab87a; font-family: Arial, sans-serif; margin-bottom: 6px; }
+  .result-value { font-size: 22px; color: #f5f9f2; font-family: 'Playfair Display', serif; }
+  .result-value.highlight { color: #7ecb9a; }
+  .result-value.warning { color: #f5c9a8; }
+  .results-note { font-size: 12px; color: #8ab87a; line-height: 1.7; font-family: Arial, sans-serif; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; margin-top: 4px; }
+
+  .exclusion-banner { background: rgba(126,203,154,0.15); border: 1px solid rgba(126,203,154,0.3); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; display: none; }
+  .exclusion-banner.visible { display: block; }
+  .exclusion-banner p { font-size: 13px; color: #7ecb9a; line-height: 1.6; font-family: Arial, sans-serif; }
+
+  .btn-calc { width: 100%; padding: 14px; background: #4a6741; color: #f5f9f2; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s; margin-top: 8px; }
+  .btn-calc:hover { background: #3a5433; }
+
+  .cta-section { background: #4a6741; border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 24px; }
+  .cta-title { font-family: 'Playfair Display', serif; font-size: 22px; color: #f5f9f2; margin-bottom: 10px; }
+  .cta-body { font-size: 14px; color: #b8d4a8; line-height: 1.7; margin-bottom: 20px; }
+  .cta-btn { display: inline-block; background: #f5f9f2; color: #1e3318; padding: 12px 28px; border-radius: 4px; font-size: 13px; letter-spacing: 1px; font-family: Arial, sans-serif; text-decoration: none; font-weight: bold; }
+
+  .footer { background: #1e3318; padding: 20px 40px; text-align: center; }
+  .footer-text { font-size: 11px; color: #8ab87a; line-height: 1.8; font-family: Arial, sans-serif; }
+  .footer-text a { color: #b8d4a8; }
+  .disclaimer { font-size: 11px; color: var(--light); line-height: 1.7; padding: 20px; text-align: center; font-family: Arial, sans-serif; }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .results-grid { grid-template-columns: 1fr; }
+    .container { padding: 24px 16px; }
+    .card { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">Front Porch LA</div>
+  <div class="header-title">Capital Gains Calculator</div>
+  <div class="header-sub">Estimate your tax exposure before you sell</div>
+</div>
+<div class="stripe"></div>
+
+<div class="container">
+
+  <!-- MISCONCEPTION CARD -->
+  <div class="misconception">
+    <div class="misconception-title">⚡ Two things most homeowners get wrong</div>
+    <div class="misconception-body">
+      <strong>1. The $250K/$500K exclusion is powerful — but not unlimited.</strong> If you're single, the first $250,000 of gain is tax-free. Married filing jointly? $500,000. But gains above that threshold are taxable — and in California, state tax applies on top of federal.<br><br>
+      <strong>2. A 1031 exchange doesn't apply to your primary residence.</strong> The 1031 exchange is for investment properties only. If you live in the home, you use the primary residence exclusion instead — not a 1031. Many homeowners assume they can roll gains into their next home tax-free. You can't — at least not the way a 1031 works.
+    </div>
+  </div>
+
+  <!-- CALCULATOR CARD -->
+  <div class="card">
+    <div class="card-title">Estimate your capital gains</div>
+    <div class="card-sub">Enter your property details below. This is an estimate — speak with a tax professional for advice specific to your situation.</div>
+
+    <div class="form-group">
+      <label class="form-label">Property address</label>
+      <input class="form-input" id="propAddress" placeholder="Start typing your address..." autocomplete="off" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Original purchase price</label>
+        <input class="form-input" id="purchasePrice" type="text" placeholder="$1,200,000" oninput="formatCurrencyInput(this)" />
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Estimated sale price</label>
+        <input class="form-input" id="salePrice" type="text" placeholder="$2,500,000" oninput="formatCurrencyInput(this)" />
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-top:16px;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Improvements made ($)</label>
+        <input class="form-input" id="improvements" type="text" placeholder="$150,000" oninput="formatCurrencyInput(this)" />
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Years owned</label>
+        <input class="form-input" id="yearsOwned" type="number" placeholder="8" min="0" />
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-top:16px;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Filing status</label>
+        <select class="form-select" id="filingStatus" onchange="calculate()">
+          <option value="single">Single</option>
+          <option value="married" selected>Married filing jointly</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Annual household income</label>
+        <input class="form-input" id="income" type="text" placeholder="$300,000" oninput="formatCurrencyInput(this)" />
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:16px;">
+      <label class="form-label">Primary residence?</label>
+      <select class="form-select" id="primaryResidence" onchange="calculate()">
+        <option value="yes">Yes — I live here</option>
+        <option value="no">No — investment / rental property</option>
+      </select>
+    </div>
+
+    <button class="btn-calc" onclick="calculate()">Calculate my capital gains →</button>
+
+    <div class="exclusion-banner" id="exclusionBanner">
+      <p id="exclusionText"></p>
+    </div>
+
+    <div class="results" id="results">
+      <div class="results-title">Your estimated capital gains breakdown</div>
+      <div class="results-grid">
+        <div class="result-box">
+          <div class="result-label">Total gain</div>
+          <div class="result-value" id="totalGain">—</div>
+        </div>
+        <div class="result-box">
+          <div class="result-label">Exclusion applied</div>
+          <div class="result-value highlight" id="exclusionApplied">—</div>
+        </div>
+        <div class="result-box">
+          <div class="result-label">Taxable gain</div>
+          <div class="result-value warning" id="taxableGain">—</div>
+        </div>
+        <div class="result-box">
+          <div class="result-label">Federal rate</div>
+          <div class="result-value" id="fedRate">—</div>
+        </div>
+        <div class="result-box">
+          <div class="result-label">Federal tax owed</div>
+          <div class="result-value warning" id="fedTax">—</div>
+        </div>
+        <div class="result-box">
+          <div class="result-label">CA state tax (13.3%)</div>
+          <div class="result-value warning" id="stateTax">—</div>
+        </div>
+      </div>
+
+      <div class="result-box" style="margin-bottom:16px;background:rgba(255,255,255,0.12);">
+        <div class="result-label">Total estimated tax</div>
+        <div class="result-value warning" id="totalTax" style="font-size:32px;">—</div>
+      </div>
+
+      <div class="result-box" style="background:rgba(126,203,154,0.15);border:1px solid rgba(126,203,154,0.2);">
+        <div class="result-label">Net proceeds after tax</div>
+        <div class="result-value highlight" id="netProceeds" style="font-size:28px;">—</div>
+      </div>
+
+      <div class="results-note" id="resultsNote"></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <div class="cta-title">Want to understand your full picture?</div>
+    <div class="cta-body">Capital gains are just one piece. Your agent can walk you through net proceeds, timing strategies, and what you'd net after your next purchase — in about 15 minutes.</div>
+    <a href="mailto:monthly@frontporchla.com?subject=Capital Gains Question" class="cta-btn">Talk to your agent →</a>
+  </div>
+
+  <div class="disclaimer">This calculator provides estimates for informational purposes only and does not constitute tax or legal advice. Consult a qualified tax professional before making any decisions. Federal rates and California state tax rates are based on current law and may change.</div>
+
+</div>
+
+<div class="stripe"></div>
+<div class="footer">
+  <div class="footer-text">
+    Front Porch LA &nbsp;·&nbsp; 331 Foothill Rd, Beverly Hills CA 90210<br>
+    <a href="index.html">Home</a> &nbsp;·&nbsp; <a href="mailto:monthly@frontporchla.com">Contact</a>
+  </div>
+</div>
+
+<script>
+  function formatCurrencyInput(input) {
+    let val = input.value.replace(/[^0-9]/g, '');
+    if (val) input.value = '$' + parseInt(val).toLocaleString();
+    else input.value = '';
+    calculate();
+  }
+
+  function parseInput(id) {
+    const val = document.getElementById(id).value.replace(/[^0-9]/g, '');
+    return parseInt(val) || 0;
+  }
+
+  function fmt(num) {
+    if (num === 0) return '$0';
+    return '$' + Math.round(num).toLocaleString();
+  }
+
+  function getFederalCapGainsRate(income, filing, longTerm) {
+    if (!longTerm) return 0.37; // short term = ordinary income, simplified
+    if (filing === 'married') {
+      if (income <= 94050) return 0;
+      if (income <= 583750) return 0.15;
+      return 0.20;
+    } else {
+      if (income <= 47025) return 0;
+      if (income <= 518900) return 0.15;
+      return 0.20;
+    }
+  }
+
+  function calculate() {
+    const purchase = parseInput('purchasePrice');
+    const sale = parseInput('salePrice');
+    const improvements = parseInput('improvements');
+    const years = parseInt(document.getElementById('yearsOwned').value) || 0;
+    const income = parseInput('income');
+    const filing = document.getElementById('filingStatus').value;
+    const primary = document.getElementById('primaryResidence').value;
+
+    if (!purchase || !sale) return;
+
+    const basis = purchase + improvements;
+    const totalGain = sale - basis;
+    const longTerm = years >= 2;
+
+    // Primary residence exclusion
+    let exclusion = 0;
+    if (primary === 'yes' && years >= 2) {
+      exclusion = filing === 'married' ? 500000 : 250000;
+    }
+
+    const taxableGain = Math.max(0, totalGain - exclusion);
+    const fedRate = getFederalCapGainsRate(income, filing, longTerm);
+    const CA_RATE = 0.133; // California top rate for capital gains
+
+    const fedTax = taxableGain * fedRate;
+    const stateTax = taxableGain * CA_RATE;
+    const totalTax = fedTax + stateTax;
+    const netProceeds = sale - totalTax;
+
+    // Show exclusion banner
+    const banner = document.getElementById('exclusionBanner');
+    const bannerText = document.getElementById('exclusionText');
+    if (primary === 'yes' && years >= 2) {
+      banner.classList.add('visible');
+      bannerText.innerHTML = `✓ You qualify for the primary residence exclusion — the first <strong>${fmt(exclusion)}</strong> of your gain is tax-free.`;
+    } else if (primary === 'yes' && years < 2) {
+      banner.classList.add('visible');
+      bannerText.innerHTML = `⚠️ You need to have lived in the home for at least 2 of the last 5 years to qualify for the primary residence exclusion. You may not qualify yet.`;
+    } else {
+      banner.classList.remove('visible');
+    }
+
+    // Show results
+    const results = document.getElementById('results');
+    results.classList.add('visible');
+
+    document.getElementById('totalGain').textContent = fmt(totalGain);
+    document.getElementById('exclusionApplied').textContent = fmt(Math.min(exclusion, totalGain));
+    document.getElementById('taxableGain').textContent = fmt(taxableGain);
+    document.getElementById('fedRate').textContent = Math.round(fedRate * 100) + '%' + (longTerm ? ' (long-term)' : ' (short-term)');
+    document.getElementById('fedTax').textContent = fmt(fedTax);
+    document.getElementById('stateTax').textContent = fmt(stateTax);
+    document.getElementById('totalTax').textContent = fmt(totalTax);
+    document.getElementById('netProceeds').textContent = fmt(netProceeds);
+
+    let note = `Based on ${years >= 2 ? 'long-term' : 'short-term'} capital gains rates. `;
+    if (primary === 'no') note += 'Investment property — no primary residence exclusion applies. A 1031 exchange may defer taxes if you reinvest in another investment property. ';
+    note += 'California taxes capital gains as ordinary income at up to 13.3%. Federal rates shown are for capital gains, not ordinary income. This is an estimate only.';
+    document.getElementById('resultsNote').textContent = note;
+  }
+
+  // Google Maps autocomplete for address
+  function initAutocomplete() {
+    if (!window.google) return;
+    const input = document.getElementById('propAddress');
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+      componentRestrictions: { country: 'us' },
+      fields: ['formatted_address']
+    });
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (place.formatted_address) {
+        input.value = place.formatted_address;
+      }
+    });
+  }
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAaNEzDIZXk-tSuds24aQljvHSURJ2d2o&libraries=places&callback=initAutocomplete" async defer></script>
+
+</body>
+</html>
