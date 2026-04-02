@@ -630,6 +630,9 @@
 
     document.getElementById('newNoteInput').value = '';
     renderNoteHistory(sub.notes);
+    renderScoreBreakdown(sub);
+    loadClickHistory(sub.id);
+    
     document.getElementById('profileOverlay').classList.add('open');
     document.getElementById('profilePanel').classList.add('open');
   }
