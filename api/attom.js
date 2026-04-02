@@ -59,12 +59,13 @@ async function getMarketStats(zip) {
       headers: headers()
     });
 
-    const responseText = await res.text();
-    console.log('ATTOM Sales response:', res.status, responseText.substring(0, 500));
-    if (!res.ok) {
+   if (!res.ok) {
+      const errText = await res.text();
+      console.error('ATTOM Sales error:', res.status, errText.substring(0, 300));
       return null;
     }
-    const data = JSON.parse(responseText);
+    const data = await res.json();
+    console.log('ATTOM Sales data:', JSON.stringify(data).substring(0, 300));
     const sales = data?.property || [];
     if (sales.length === 0) return null;
 
