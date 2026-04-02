@@ -681,9 +681,9 @@
       rows += '<div class="score-total-bar"><span>Total score</span><span>' + score + ' pts · ' + statusLabel(status) + '</span></div>';
     }
 
-    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const currentMonth = months[new Date().getMonth()];
-document.getElementById('scoreBreakdownSection').querySelector('.profile-section-label').textContent = currentMonth + "'s score breakdown";
+document.getElementById('scoreBreakdownLabel').textContent = currentMonth + "'s score breakdown";
 document.getElementById('scoreBreakdownBody').innerHTML = rows || '<div style="font-size:13px;color:var(--light);">No activity yet.</div>';
   }
 
