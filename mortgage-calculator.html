@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mortgage Calculator — Front Porch LA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF7; --sand: #E8DDD0;
+    --clay: #C4A882; --terra: #B5652A; --charcoal: #2C2825;
+    --mid: #6B6058; --light: #9B9088; --green: #3D5A47; --green-light: #EBF0EC;
+    --green-dark: #1e3318; --green-mid: #4a6741; --green-stripe: #8ab87a;
+    --input-bg: #f2f7ee; --input-border: #d4e8c8;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: #f0f4ee; color: var(--charcoal); min-height: 100vh; }
+
+  .mc-header { background: var(--green-mid); padding: 40px 40px 28px; text-align: center; }
+  .mc-header-eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green-stripe); margin-bottom: 8px; font-weight: 500; }
+  .mc-header-title { font-family: 'Playfair Display', serif; font-size: 32px; color: #f5f9f2; margin-bottom: 8px; }
+  .mc-header-sub { font-size: 14px; color: var(--green-stripe); font-weight: 300; }
+  .mc-stripe { height: 3px; background: var(--green-stripe); }
+
+  .mc-body { max-width: 640px; margin: 0 auto; padding: 40px 24px; }
+
+  .mc-card { background: #fff; border-radius: 16px; border: 1px solid var(--input-border); padding: 28px; margin-bottom: 20px; }
+
+  .mc-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #6a8f5e; font-weight: 500; margin-bottom: 7px; display: flex; align-items: center; gap: 6px; }
+  .mc-input { width: 100%; padding: 12px 14px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--green-dark); outline: none; transition: border-color 0.2s; }
+  .mc-input:focus { border-color: var(--green-mid); }
+
+  .mc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .mc-group { margin-bottom: 0; }
+
+  .mc-term { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mc-term-btn { padding: 12px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--green-mid); cursor: pointer; text-align: center; transition: all 0.15s; }
+  .mc-term-btn:hover { border-color: var(--green-mid); }
+  .mc-term-btn.active { background: var(--green-mid); color: #fff; border-color: var(--green-mid); }
+
+  .divider { height: 1px; background: var(--input-border); margin: 20px 0; }
+
+  .info-i { width: 15px; height: 15px; border-radius: 50%; background: var(--input-border); color: var(--green-mid); font-size: 9px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; cursor: default; position: relative; flex-shrink: 0; }
+  .info-i .tip { display: none; position: absolute; left: 20px; top: -4px; background: var(--green-dark); color: #f5f9f2; font-size: 11px; padding: 8px 12px; border-radius: 8px; width: 230px; line-height: 1.6; z-index: 10; font-style: normal; text-transform: none; letter-spacing: 0; font-weight: 400; }
+  .info-i:hover .tip { display: block; }
+
+  .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #f2f7ee; font-size: 13px; }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-label { color: #6a8f5e; }
+  .breakdown-val { color: var(--green); font-weight: 500; }
+  .total-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--green); border-radius: 10px; margin-top: 6px; }
+  .total-bar-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--green-stripe); font-weight: 500; }
+  .total-bar-val { font-family: 'Playfair Display', serif; font-size: 26px; color: #f5f9f2; }
+
+  .cta-card { background: var(--green-mid); border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 20px; }
+  .cta-eyebrow { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--green-stripe); margin-bottom: 10px; font-weight: 500; }
+  .cta-headline { font-family: 'Playfair Display', serif; font-size: 20px; color: #f5f9f2; font-style: italic; margin-bottom: 8px; line-height: 1.4; }
+  .cta-sub { font-size: 13px; color: var(--green-stripe); margin-bottom: 20px; font-weight: 300; line-height: 1.6; }
+  .cta-btn { display: inline-block; background: #f5f9f2; color: var(--green-dark); padding: 13px 32px; border-radius: 100px; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; text-decoration: none; letter-spacing: 0.5px; transition: background 0.2s; }
+  .cta-btn:hover { background: #fff; }
+
+  .mc-footer { text-align: center; padding-bottom: 40px; }
+  .mc-footer p { font-size: 11px; color: #6a8f5e; line-height: 1.7; max-width: 460px; margin: 0 auto; font-weight: 300; }
+</style>
+</head>
+<body>
+
+<div class="mc-header">
+  <p class="mc-header-eyebrow">Front Porch LA</p>
+  <h1 class="mc-header-title">Mortgage calculator</h1>
+  <p class="mc-header-sub">Estimate your all-in monthly payment</p>
+</div>
+<div class="mc-stripe"></div>
+
+<div class="mc-body">
+
+  <div class="mc-card">
+    <div class="mc-row">
+      <div class="mc-group">
+        <div class="mc-label">Home price</div>
+        <input class="mc-input" id="homePrice" />
+      </div>
+      <div class="mc-group">
+        <div class="mc-label">Down payment</div>
+        <input class="mc-input" id="downPayment" />
+      </div>
+    </div>
+    <div class="mc-row">
+      <div class="mc-group">
+        <div class="mc-label">Interest rate</div>
+        <input class="mc-input" id="rate" />
+      </div>
+      <div class="mc-group">
+        <div class="mc-label">Loan term</div>
+        <div class="mc-term">
+          <div class="mc-term-btn active" id="btn30" onclick="setTerm(30)">30 yr</div>
+          <div class="mc-term-btn" id="btn15" onclick="setTerm(15)">15 yr</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="mc-row">
+      <div class="mc-group">
+        <div class="mc-label">
+          Property tax (annual)
+          <span class="info-i">i<span class="tip">LA County averages 1.25% of property value per year. Auto-filled from your home price but editable for your specific area.</span></span>
+        </div>
+        <input class="mc-input" id="propTax" />
+      </div>
+      <div class="mc-group">
+        <div class="mc-label">
+          Home insurance (annual)
+          <span class="info-i">i<span class="tip">Estimated at 0.5% of home value per year. Auto-filled from your home price but editable based on your actual policy.</span></span>
+        </div>
+        <input class="mc-input" id="insurance" />
+      </div>
+    </div>
+    <div class="mc-group" style="margin-top:4px;">
+      <div class="mc-label">
+        Monthly HOA
+        <span class="info-i">i<span class="tip">Homeowners Association fee charged by some communities for shared amenities and maintenance. Many single-family homes have no HOA — enter $0 if yours doesn't.</span></span>
+      </div>
+      <input class="mc-input" id="hoa" />
+    </div>
+  </div>
+
+  <div class="mc-card">
+    <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#6a8f5e;font-weight:500;margin-bottom:14px;">Monthly breakdown</p>
+    <div>
+      <div class="breakdown-row"><span class="breakdown-label">Principal &amp; interest</span><span class="breakdown-val" id="pi">—</span></div>
+      <div class="breakdown-row"><span class="breakdown-label">Property taxes</span><span class="breakdown-val" id="taxMo">—</span></div>
+      <div class="breakdown-row"><span class="breakdown-label">Home insurance</span><span class="breakdown-val" id="insMo">—</span></div>
+      <div class="breakdown-row"><span class="breakdown-label">HOA</span><span class="breakdown-val" id="hoaMo">—</span></div>
+    </div>
+    <div class="total-bar">
+      <span class="total-bar-label">Total monthly payment</span>
+      <span class="total-bar-val" id="total">—</span>
+    </div>
+  </div>
+
+  <div class="cta-card">
+    <p class="cta-eyebrow">Ready to talk numbers?</p>
+    <p class="cta-headline" id="ctaHeadline">I can help you understand what you can afford in LA.</p>
+    <p class="cta-sub" id="ctaSub">Connect with me to get pre-approved, compare lenders, and find the right home at the right price.</p>
+    <a href="#" class="cta-btn" id="ctaBtn">Get in touch</a>
+  </div>
+
+  <div class="mc-footer">
+    <p>This calculator provides estimates only. Actual payments may vary based on lender terms, credit score, property taxes, and insurance rates. Consult a licensed lender for personalized guidance.</p>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://gykkvpfbyjllomthdlmw.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_bOBUK_TtANfu365rkKlj1w_wHuMWT-y';
+  const { createClient } = supabase;
+  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let term = 30;
+  let rateRaw = 675;
+
+  function parseVal(str) {
+    return parseFloat((str + '').replace(/[$,%]/g, '').replace(/,/g, '')) || 0;
+  }
+
+  function fmtDollar(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function fmtRate(raw) {
+    const s = raw.toString().padStart(3, '0');
+    const intPart = s.slice(0, -2) || '0';
+    const decPart = s.slice(-2);
+    return intPart + '.' + decPart + '%';
+  }
+
+  function setDollarInput(el, value) {
+    el.value = fmtDollar(value);
+  }
+
+  function attachDollarInput(el, onChangeCb) {
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        e.preventDefault();
+        const raw = parseVal(this.value);
+        const str = Math.floor(raw).toString();
+        const newStr = str.length > 1 ? str.slice(0, -1) : '0';
+        setDollarInput(this, parseInt(newStr));
+        onChangeCb();
+        return;
+      }
+      if (e.key >= '0' && e.key <= '9') {
+        e.preventDefault();
+        const raw = parseVal(this.value);
+        const str = raw === 0 ? e.key : Math.floor(raw).toString() + e.key;
+        setDollarInput(this, parseInt(str));
+        onChangeCb();
+      }
+    });
+    el.addEventListener('focus', function() {
+      setTimeout(() => { this.selectionStart = this.selectionEnd = this.value.length; }, 0);
+    });
+  }
+
+  function attachRateInput(el) {
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        e.preventDefault();
+        rateRaw = Math.floor(rateRaw / 10);
+        el.value = fmtRate(rateRaw);
+        calc();
+        return;
+      }
+      if (e.key >= '0' && e.key <= '9') {
+        e.preventDefault();
+        const newRaw = parseInt(rateRaw.toString() + e.key);
+        if (newRaw <= 9999) {
+          rateRaw = newRaw;
+          el.value = fmtRate(rateRaw);
+          calc();
+        }
+      }
+    });
+    el.addEventListener('focus', function() {
+      setTimeout(() => { this.selectionStart = this.selectionEnd = this.value.length; }, 0);
+    });
+  }
+
+  function setTerm(t) {
+    term = t;
+    document.getElementById('btn30').className = 'mc-term-btn' + (t === 30 ? ' active' : '');
+    document.getElementById('btn15').className = 'mc-term-btn' + (t === 15 ? ' active' : '');
+    calc();
+  }
+
+  function updateAutoFields() {
+    const price = parseVal(document.getElementById('homePrice').value);
+    setDollarInput(document.getElementById('propTax'), Math.round(price * 0.0125));
+    setDollarInput(document.getElementById('insurance'), Math.round(price * 0.005));
+    calc();
+  }
+
+  function calc() {
+    const price = parseVal(document.getElementById('homePrice').value);
+    const down = parseVal(document.getElementById('downPayment').value);
+    const rate = rateRaw / 100;
+    const propTaxAnnual = parseVal(document.getElementById('propTax').value);
+    const insAnnual = parseVal(document.getElementById('insurance').value);
+    const hoa = parseVal(document.getElementById('hoa').value);
+
+    const principal = price - down;
+    const monthlyRate = rate / 100 / 12;
+    const n = term * 12;
+
+    let pi = 0;
+    if (monthlyRate > 0 && principal > 0) {
+      pi = principal * (monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
+    }
+
+    const taxMo = propTaxAnnual / 12;
+    const insMo = insAnnual / 12;
+    const total = pi + taxMo + insMo + hoa;
+
+    document.getElementById('pi').textContent = fmtDollar(pi);
+    document.getElementById('taxMo').textContent = fmtDollar(taxMo);
+    document.getElementById('insMo').textContent = fmtDollar(insMo);
+    document.getElementById('hoaMo').textContent = fmtDollar(hoa);
+    document.getElementById('total').textContent = fmtDollar(total);
+  }
+
+  async function loadAgent() {
+    const params = new URLSearchParams(window.location.search);
+    const agentId = params.get('agent');
+    if (!agentId) return;
+    const { data: agent } = await client
+      .from('agents')
+      .select('full_name, reply_to_email')
+      .eq('id', agentId)
+      .single();
+    if (!agent) return;
+    const firstName = agent.full_name.split(' ')[0];
+    document.getElementById('ctaHeadline').textContent = firstName + ' can help you understand what you can truly afford in LA.';
+    document.getElementById('ctaSub').textContent = 'Reach out to get pre-approved, compare lenders, and find the right home at the right price.';
+    document.getElementById('ctaBtn').textContent = 'Talk to ' + firstName;
+    document.getElementById('ctaBtn').href = 'mailto:' + agent.reply_to_email + '?subject=' + encodeURIComponent('Mortgage question — Front Porch LA');
+  }
+
+  function init() {
+    setDollarInput(document.getElementById('homePrice'), 2500000);
+    setDollarInput(document.getElementById('downPayment'), 500000);
+    setDollarInput(document.getElementById('propTax'), Math.round(2500000 * 0.0125));
+    setDollarInput(document.getElementById('insurance'), Math.round(2500000 * 0.005));
+    setDollarInput(document.getElementById('hoa'), 0);
+    document.getElementById('rate').value = fmtRate(rateRaw);
+
+    attachDollarInput(document.getElementById('homePrice'), updateAutoFields);
+    attachDollarInput(document.getElementById('downPayment'), calc);
+    attachDollarInput(document.getElementById('propTax'), calc);
+    attachDollarInput(document.getElementById('insurance'), calc);
+    attachDollarInput(document.getElementById('hoa'), calc);
+    attachRateInput(document.getElementById('rate'));
+
+    calc();
+    loadAgent();
+  }
+
+  init();
+</script>
+</body>
+</html>
