@@ -212,31 +212,38 @@ module.exports = function generateEmail(data) {
     <tr><td style="padding:20px 40px;border-bottom:1px solid #d4e8c8;background:#f2f7ee;">
       <p style="margin:0 0 12px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a6741;font-family:Arial,sans-serif;">Homeowner tools</p>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td width="50%" style="padding-right:8px;">
-            <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=capital-gains&dest=${encodeURIComponent('https://frontporchla.com/capital-gains.html?agent=' + agentId)}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:14px 16px;text-decoration:none;">
-              <p style="margin:0 0 4px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">💰 Capital Gains Calculator</p>
-              <p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Estimate your tax exposure before you sell</p>
-            </a>
-          </td>
-          <td width="50%" style="padding-left:8px;">
-            <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=home-value-tool&dest=${encodeURIComponent('https://frontporchla.com/home-value.html?agent=' + agentId)}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:14px 16px;text-decoration:none;">
-              <p style="margin:0 0 4px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">🏡 How Is My Home Valued?</p>
-              <p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Understand your ATTOM estimate</p>
-            </a>
-          </td>
-        </tr>
-        <tr>
-            <td colspan="2" style="padding-top:8px;">
-              <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=mortgage&dest=${encodeURIComponent('https://frontporchla.com/mortgage-calculator?agent=' + agentId)}" style="display:block;padding:12px 16px;background:#f2f7ee;border:1px solid #d4e8c8;border-radius:100px;font-size:13px;color:#1e3318;text-decoration:none;text-align:center;font-family:Arial,sans-serif;">
-                <p style="margin:0 0 4px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">🏦 Mortgage calculator</p>
-                <p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Estimate your all-in monthly payment</p>
-              </a>
-            </td>
-          </tr>
+        <tr><td style="padding-bottom:8px;">
+          <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=capital-gains&dest=${encodeURIComponent('https://frontporchla.com/capital-gains.html?agent=' + agentId)}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:13px 16px;text-decoration:none;">
+            <table width="100%" cellpadding="0" cellspacing="0"><tr>
+              <td style="font-size:18px;width:32px;">💰</td>
+              <td><p style="margin:0 0 2px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">Capital gains calculator</p><p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Estimate your tax exposure before you sell</p></td>
+              <td style="text-align:right;font-size:14px;color:#4a6741;">→</td>
+            </tr></table>
+          </a>
+        </td></tr>
+        <tr><td style="padding-bottom:8px;">
+          <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=mortgage&dest=${encodeURIComponent('https://frontporchla.com/mortgage-calculator?agent=' + agentId)}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:13px 16px;text-decoration:none;">
+            <table width="100%" cellpadding="0" cellspacing="0"><tr>
+              <td style="font-size:18px;width:32px;">🏦</td>
+              <td><p style="margin:0 0 2px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">Mortgage calculator</p><p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Estimate your all-in monthly payment</p></td>
+              <td style="text-align:right;font-size:14px;color:#4a6741;">→</td>
+            </tr></table>
+          </a>
+        </td></tr>
+        <tr><td>
+          <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=home-value-tool&dest=${encodeURIComponent('https://frontporchla.com/home-value.html?agent=' + agentId)}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:13px 16px;text-decoration:none;">
+            <table width="100%" cellpadding="0" cellspacing="0"><tr>
+              <td style="font-size:18px;width:32px;">🏡</td>
+              <td><p style="margin:0 0 2px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">How is my home valued?</p><p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Understand your ATTOM estimate</p></td>
+              <td style="text-align:right;font-size:14px;color:#4a6741;">→</td>
+            </tr></table>
+          </a>
+        </td></tr>
+      </table>
+    </td></tr>
 
     <!-- CTA -->
-    <tr><td colspan="2" style="padding:32px 40px;text-align:center;background:#f2f7ee;width:100%;">
+    <tr><td style="padding:32px 40px;text-align:center;background:#f2f7ee;border-bottom:1px solid #d4e8c8;">
       <p style="margin:0 0 18px;font-size:15px;color:#4a6741;font-style:italic;line-height:1.7;font-family:Georgia,serif;">Thinking about what your home is worth, or just curious what's out there?<br>I'm always happy to talk — no pressure, just a good conversation.</p>
       <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=contact&dest=${encodeURIComponent(contactUrl)}" style="display:inline-block;background:#4a6741;color:#f5f9f2;padding:12px 28px;border-radius:4px;font-size:13px;letter-spacing:1px;font-family:Arial,sans-serif;text-decoration:none;">Get in touch with ${agentName.split(' ')[0]} →</a>
     </td></tr>
