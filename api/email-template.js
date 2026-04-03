@@ -31,6 +31,7 @@ module.exports = function generateEmail(data) {
     unsubscribeUrl,
     agentId,
     subscriberId,
+    zoneMapUrl,
   } = data;
 
   return `<!DOCTYPE html>
