@@ -164,7 +164,8 @@ try {
               contactUrl: `mailto:${agent.reply_to_email || agent.email}`,
               unsubscribeUrl: `https://frontporchla.com/unsubscribe?email=${encodeURIComponent(sub.email)}`,
               agentId: agent.id,
-subscriberId: sub.id,
+              subscriberId: sub.id,
+              zoneMapUrl: zoneMapUrl,
             };
 
             const html = generateEmail(templateData);
