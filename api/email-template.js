@@ -226,6 +226,23 @@ module.exports = function generateEmail(data) {
             </a>
           </td>
         </tr>
+        <tr>
+            <td colspan="2" style="padding-top:8px;">
+              <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=mortgage&dest=${encodeURIComponent('https://frontporchla.com/mortgage-calculator?agent=' + agentId)}" style="display:block;padding:12px 16px;background:#f2f7ee;border:1px solid #d4e8c8;border-radius:100px;font-size:13px;color:#1e3318;text-decoration:none;text-align:center;font-family:Arial,sans-serif;">
+                <p style="margin:0 0 4px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">🏦 Mortgage calculator</p>
+                <p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Estimate your all-in monthly payment</p>
+              </a>
+            </td>
+          </tr>
+```
+
+So the final structure reads:
+```
+line 228  </tr>         ← existing, keep
+          <tr>          ← add this new block here
+            ...
+          </tr>
+line 229  </table>      ← existing, keep
       </table>
     </td></tr>
 
