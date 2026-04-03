@@ -644,43 +644,6 @@
     });
   }
 
-  function renderScoreBreakdown(sub) {
-    const score = sub.engagement_score || 0;
-    const status = calcStatus(score);
-    const opens = sub.total_opens || 0;
-    const openPts = opens * 5;
-    let rows = '';
-
-    if (opens > 0) {
-      rows += '<div class="score-breakdown-row">' +
-        '<div class="score-breakdown-left">Email opens</div>' +
-        '<div style="display:flex;align-items:center;gap:8px;">' +
-        '<span class="score-breakdown-count">' + opens + ' × 5 pts</span>' +
-        '<span class="score-breakdown-pts">+' + openPts + '</span>' +
-        '</div></div>';
-    }
-
-    if (sub.opened_last_month) {
-      rows += '<div class="score-breakdown-row">' +
-        '<div class="score-breakdown-left">Open streak bonus ' +
-        '<span class="info-i">i<span class="tip">Awarded when a subscriber opens emails 2 months in a row — shows consistent interest in the neighborhood.</span></span>' +
-        '</div>' +
-        '<div style="display:flex;align-items:center;gap:8px;">' +
-        '<span class="score-breakdown-count">2 mo. streak</span>' +
-        '<span class="score-breakdown-pts">+15</span>' +
-        '</div></div>';
-    }
-
-    if (score > 0) {
-      rows += '<div class="score-total-bar"><span>Total score</span><span>' + score + ' pts · ' + statusLabel(status) + '</span></div>';
-    }
-
-   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const currentMonth = months[new Date().getMonth()];
-document.getElementById('scoreBreakdownLabel').textContent = currentMonth + "'s score breakdown";
-document.getElementById('scoreBreakdownBody').innerHTML = rows || '<div style="font-size:13px;color:var(--light);">No activity yet.</div>';
-  }
-
   async function loadClickHistory(subscriberId) {
     const container = document.getElementById('clickHistoryBody');
     container.innerHTML = '<div style="font-size:13px;color:var(--light);">Loading...</div>';
