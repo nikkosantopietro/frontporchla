@@ -82,7 +82,7 @@ module.exports = async (req, res) => {
     for (const agent of agents) {
       const { data: subscribers } = await supabase
         .from('subscribers')
-        .select('*, zones(name, color)')
+        .select('*, zones(name, color, coordinates)')
         .eq('agent_id', agent.id)
         .eq('unsubscribed', false)
         .not('zone_id', 'is', null)
