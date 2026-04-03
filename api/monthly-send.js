@@ -110,6 +110,7 @@ module.exports = async (req, res) => {
       }
 
       for (const zoneId of Object.keys(byZone)) {
+        const { zone, subscribers: zoneSubs } = byZone[zoneId];
         const zoneMapUrl = buildZoneMapUrl(zone);
 
         const sampleAddress = zoneSubs[0]?.address;
