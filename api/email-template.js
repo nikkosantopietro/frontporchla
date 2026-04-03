@@ -234,17 +234,6 @@ module.exports = function generateEmail(data) {
               </a>
             </td>
           </tr>
-```
-
-So the final structure reads:
-```
-line 228  </tr>         ← existing, keep
-          <tr>          ← add this new block here
-            ...
-          </tr>
-line 229  </table>      ← existing, keep
-      </table>
-    </td></tr>
 
     <!-- CTA -->
     <tr><td style="padding:32px 40px;text-align:center;background:#f2f7ee;">
