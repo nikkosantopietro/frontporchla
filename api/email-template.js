@@ -83,14 +83,13 @@ module.exports = function generateEmail(data) {
 
     <!-- INTRO -->
     <tr><td style="padding:28px 40px;border-bottom:1px solid #d4e8c8;background:#fafcf8;">
-      <p style="margin:0;font-size:15px;line-height:1.8;color:#2c2c2a;font-family:Georgia,serif;">Pull up a chair — here's what happened in <em style="color:#4a6741;">${zoneName}</em> last month. Homes moved fast, buyers stayed competitive, and your neighborhood held its ground as one of the Westside's most sought-after pockets.</p>
+      <p style="margin:0;font-size:15px;line-height:1.8;color:#2c2c2a;font-family:Georgia,serif;">Here's what happened in <em style="color:#4a6741;">${zoneName}</em> last month. Homes moved fast, buyers stayed competitive, and your neighborhood continued to hold strong.</p>
     </td></tr>
 
     <!-- MARKET SNAPSHOT -->
     <tr><td style="padding:28px 40px;border-bottom:1px solid #d4e8c8;">
       <p style="margin:0 0 12px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a6741;font-family:Arial,sans-serif;">Market Snapshot &nbsp;·&nbsp; ${month} ${year}</p>
 
-      <!-- Market temperature bar -->
       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
         <tr>
           <td style="width:60px;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;vertical-align:middle;">Market:</td>
@@ -103,7 +102,6 @@ module.exports = function generateEmail(data) {
         </tr>
       </table>
 
-      <!-- Stats row 1 -->
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td width="32%" style="padding-right:5px;">
@@ -136,7 +134,6 @@ module.exports = function generateEmail(data) {
         </tr>
       </table>
 
-      <!-- Stats row 2 -->
       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:9px;">
         <tr>
           <td width="32%" style="padding-right:5px;">
@@ -181,14 +178,14 @@ module.exports = function generateEmail(data) {
               <tr>
                 <td style="vertical-align:middle;">
                   <p style="margin:0 0 5px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#b8d4a8;font-family:Arial,sans-serif;">ATTOM Estimate &nbsp;·&nbsp; ${address}</p>
-                 ${avmEstimate && avmEstimate !== 'N/A' ? `
-        <p style="margin:0;font-size:27px;color:#f5f9f2;font-family:Arial,sans-serif;font-weight:bold;text-decoration:underline;text-underline-offset:3px;">${avmEstimate}</p>
-        <p style="margin:3px 0 0;font-size:11px;color:#8ab87a;font-family:Arial,sans-serif;">Range: ${avmLow} – ${avmHigh}</p>
-        <p style="margin:6px 0 0;font-size:10px;color:#8ab87a;font-family:Arial,sans-serif;font-style:italic;">How is this calculated? →</p>
-        ` : `
-        <p style="margin:0;font-size:16px;color:#f5f9f2;font-family:Georgia,serif;font-style:italic;line-height:1.5;">Want to know what your home is worth?</p>
-        <p style="margin:8px 0 0;font-size:13px;color:#8ab87a;font-family:Arial,sans-serif;">I'll give you a free, in-person home valuation — it takes about 15 minutes and there's no obligation.</p>
-        `}
+                  ${avmEstimate && avmEstimate !== 'N/A' ? `
+                  <p style="margin:0;font-size:27px;color:#f5f9f2;font-family:Arial,sans-serif;font-weight:bold;">${avmEstimate}</p>
+                  <p style="margin:3px 0 0;font-size:11px;color:#8ab87a;font-family:Arial,sans-serif;">Range: ${avmLow} – ${avmHigh}</p>
+                  <p style="margin:6px 0 0;font-size:10px;color:#8ab87a;font-family:Arial,sans-serif;font-style:italic;">How is this calculated? →</p>
+                  ` : `
+                  <p style="margin:0;font-size:16px;color:#f5f9f2;font-family:Georgia,serif;font-style:italic;line-height:1.5;">Want to know what your home is worth?</p>
+                  <p style="margin:8px 0 0;font-size:13px;color:#8ab87a;font-family:Arial,sans-serif;">I'll give you a free, in-person home valuation — it takes about 15 minutes and there's no obligation.</p>
+                  `}
                 </td>
                 <td style="text-align:right;vertical-align:middle;padding-left:16px;">
                   <p style="margin:0;font-size:16px;color:#7ecb9a;font-family:Arial,sans-serif;font-weight:bold;">${avmChange}</p>
@@ -208,34 +205,34 @@ module.exports = function generateEmail(data) {
       <p style="margin:0;font-size:14px;line-height:1.8;color:#5f5e5a;font-family:Georgia,serif;">${articleBody}</p>
     </td></tr>
 
-<!-- TOOLS ROW -->
+    <!-- TOOLS ROW -->
     <tr><td style="padding:20px 40px;border-bottom:1px solid #d4e8c8;background:#f2f7ee;">
       <p style="margin:0 0 12px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a6741;font-family:Arial,sans-serif;">Homeowner tools</p>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr><td style="padding-bottom:8px;">
           <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=capital-gains&dest=${encodeURIComponent('https://frontporchla.com/capital-gains.html?agent=' + agentId)}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:13px 16px;text-decoration:none;">
-            <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
               <td style="font-size:18px;width:32px;">💰</td>
               <td><p style="margin:0 0 2px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">Capital gains calculator</p><p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Estimate your tax exposure before you sell</p></td>
-              <td style="text-align:right;font-size:14px;color:#4a6741;">→</td>
+              <td style="text-align:right;font-size:14px;color:#4a6741;font-family:Arial,sans-serif;">→</td>
             </tr></table>
           </a>
         </td></tr>
         <tr><td style="padding-bottom:8px;">
           <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=mortgage&dest=${encodeURIComponent('https://frontporchla.com/mortgage-calculator?agent=' + agentId)}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:13px 16px;text-decoration:none;">
-            <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
               <td style="font-size:18px;width:32px;">🏦</td>
               <td><p style="margin:0 0 2px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">Mortgage calculator</p><p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Estimate your all-in monthly payment</p></td>
-              <td style="text-align:right;font-size:14px;color:#4a6741;">→</td>
+              <td style="text-align:right;font-size:14px;color:#4a6741;font-family:Arial,sans-serif;">→</td>
             </tr></table>
           </a>
         </td></tr>
         <tr><td>
           <a href="https://frontporchla.com/api/track?sid=${subscriberId}&lid=home-value-tool&dest=${encodeURIComponent('https://frontporchla.com/home-value.html?agent=' + agentId)}" style="display:block;background:#ffffff;border:1px solid #d4e8c8;border-radius:8px;padding:13px 16px;text-decoration:none;">
-            <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
               <td style="font-size:18px;width:32px;">🏡</td>
               <td><p style="margin:0 0 2px;font-size:13px;color:#1e3318;font-family:Arial,sans-serif;font-weight:bold;">How is my home valued?</p><p style="margin:0;font-size:11px;color:#6a8f5e;font-family:Arial,sans-serif;">Understand your ATTOM estimate</p></td>
-              <td style="text-align:right;font-size:14px;color:#4a6741;">→</td>
+              <td style="text-align:right;font-size:14px;color:#4a6741;font-family:Arial,sans-serif;">→</td>
             </tr></table>
           </a>
         </td></tr>
