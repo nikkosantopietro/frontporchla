@@ -13,6 +13,41 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+function buildZoneMapUrl(zone) {
+  try {
+    const coords = typeof zone.coordinates === 'string'
+      ? JSON.parse(zone.coordinates)
+      : zone.coordinates;
+    if (!coords || coords.length === 0) return null;
+
+    const lats = coords.map(c => c.lat);
+    const lngs = coords.map(c => c.lng);
+    const centerLat = ((Math.max(...lats) + Math.min(...lats)) / 2).toFixed(6);
+    const centerLng = ((Math.max(...lngs) + Math.min(...lngs)) / 2).toFixed(6);
+
+    const pathPoints = [...coords, coords[0]].map(c => c.lat.toFixed(6) + ',' + c.lng.toFixed(6)).join('|');
+    const path = 'color:0x4a6741ff|weight:2|fillcolor:0x4a674140|' + pathPoints;
+
+    return 'https://maps.googleapis.com/maps/api/staticmap' +
+      '?center=' + centerLat + ',' + centerLng +
+      '&zoom=14' +
+      '&size=560x200' +
+      '&maptype=roadmap' +
+      '&style=feature:poi|visibility:off' +
+      '&style=feature:transit|visibility:off' +
+      '&style=feature:landscape|element:geometry|color:0xf2f7ee' +
+      '&style=feature:water|element:geometry|color:0xd4e8c8' +
+      '&style=feature:road|element:geometry|color:0xffffff' +
+      '&style=feature:road|element:geometry.stroke|color:0xd4e8c8' +
+      '&style=feature:road|element:labels.text.fill|color:0x4a6741' +
+      '&path=' + encodeURIComponent(path) +
+      '&key=AIzaSyDAaNEzDIZXk-tSuds24aQljvHSURJ2d2o';
+  } catch (err) {
+    console.error('Zone map error:', err);
+    return null;
+  }
+}
+
 module.exports = async (req, res) => {
   const authHeader = req.headers['authorization'];
   const cronSecret = process.env.CRON_SECRET;
