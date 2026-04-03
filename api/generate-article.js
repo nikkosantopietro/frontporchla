@@ -14,7 +14,7 @@ async function generateArticle(zoneName, marketStats, month, year) {
     '3. Local entertainment — new boutiques, art shows, pop-ups, events, or cultural moments\n' +
     '4. Any development, construction, or zoning news that affects the neighborhood\n' +
     '5. Anything a well-connected neighbor would be talking about at a dinner party\n\n' +
-    'Then write a short neighborhood article (2 paragraphs, 80-100 words total) for ' + month + ' ' + year + ' using both what you found AND these market stats:\n' +
+    'Then write a short neighborhood article (1 paragraph, 40-50 words total) for ' + month + ' ' + year + ' using both what you found AND these market stats:\n' +
     '- Median sale price: ' + medianPrice + '\n' +
     '- Price per sq ft: ' + pricePerSqFt + '\n' +
     '- Homes sold: ' + homesSold + '\n' +
