@@ -71,15 +71,12 @@ module.exports = function generateEmail(data) {
       </table>
     </td></tr>
 
-    <!-- ZONE MAP -->
+   <!-- ZONE MAP -->
     <tr><td style="padding:28px 40px;border-bottom:1px solid #d4e8c8;">
-      <p style="margin:0 0 10px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a6741;font-family:Arial,sans-serif;">Your Zone</p>
+      <p style="margin:0 0 10px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a6741;font-family:Arial,sans-serif;">Your Zone &nbsp;·&nbsp; ${zoneName}</p>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr><td style="border-radius:8px;overflow:hidden;border:1px solid #d4e8c8;">
           ${zoneMapUrl ? '<img src="' + zoneMapUrl + '" width="560" style="display:block;width:100%;max-width:560px;" alt="' + zoneName + '" />' : ''}
-          <div style="padding:12px 16px;background:#f2f7ee;">
-            <p style="margin:0;font-size:16px;color:#1e3318;font-family:Georgia,serif;">${zoneName}</p>
-          </div>
         </td></tr>
       </table>
     </td></tr>
