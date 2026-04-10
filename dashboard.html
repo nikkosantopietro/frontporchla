@@ -519,6 +519,9 @@ function updateGreeting() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const hotList = 'Hot list';
+  const hotListEls = document.querySelectorAll('.section-title');
+  if (hotListEls.length > 1) hotListEls[1].textContent = hotList;
+  else if (hotListEls.length === 1) hotListEls[0].textContent = hotList;
   const el = document.getElementById('mainGreeting');
   const nav = document.getElementById('navGreeting');
   if (el) el.textContent = greeting;
