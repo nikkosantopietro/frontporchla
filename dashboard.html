@@ -518,10 +518,13 @@ async function triggerMonthlySend() {
 function updateGreeting() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const hotList = hour < 12 ? 'Morning hot list' : hour < 17 ? 'Afternoon hot list' : 'Evening hot list';
   const el = document.getElementById('mainGreeting');
   const nav = document.getElementById('navGreeting');
   if (el) el.textContent = greeting;
   if (nav) nav.childNodes[0].textContent = greeting + ', ';
+  const hotListEl = document.querySelector('.section-title');
+  if (hotListEl) hotListEl.textContent = hotList;
 }
 updateGreeting();
 
