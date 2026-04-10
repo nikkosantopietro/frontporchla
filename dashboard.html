@@ -515,8 +515,17 @@ async function triggerMonthlySend() {
     btn.disabled = false;
     btn.textContent = 'Send test email →';
   }
+function updateGreeting() {
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const el = document.getElementById('mainGreeting');
+  const nav = document.getElementById('navGreeting');
+  if (el) el.textContent = greeting;
+  if (nav) nav.childNodes[0].textContent = greeting + ', ';
+}
+updateGreeting();
 
-  init();
+init();
 </script>
 
 </body>
