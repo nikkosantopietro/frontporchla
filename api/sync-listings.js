@@ -71,23 +71,36 @@ async function triggerApifyRun(bounds, status, zoneId) {
   }));
 
   const startUrl = `https://www.zillow.com/homes/${status === 'sold' ? 'sold' : 'for_sale'}/?searchQueryState=${searchUrlState}`;
-
   const webhookUrl = `https://frontporchla.com/api/apify-webhook?zoneId=${zoneId}&status=${status}&token=${process.env.CRON_SECRET}`;
 
-  const resp = await fetch(`https://api.apify.com/v2/acts/${APIFY_ACTOR_ID}/runs?token=${APIFY_TOKEN}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      searchUrls: [{ url: startUrl }],
-      extractionMethod: 'PAGINATION_WITH_ZOOM_IN',
-      maxItems: 500,
-      webhooks: [{
-        eventTypes: ['ACTOR.RUN.SUCCEEDED'],
-        requestUrl: webhookUrl
-      }]
-    })
-  });
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-  const result = await resp.json();
-  return result?.data?.id || null;
+    const resp = await fetch(`https://api.apify.com/v2/acts/${APIFY_ACTOR_ID}/runs?token=${APIFY_TOKEN}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        searchUrls: [{ url: startUrl }],
+        extractionMethod: 'PAGINATION_WITH_ZOOM_IN',
+        maxItems: 500,
+        webhooks: [{
+          eventTypes: ['ACTOR.RUN.SUCCEEDED'],
+          requestUrl: webhookUrl
+        }]
+      })
+    });
+
+    clearTimeout(timeoutId);
+    const result = await resp.json();
+    if (!resp.ok) {
+      console.error(`Apify error for ${zoneId} ${status}:`, JSON.stringify(result));
+      return null;
+    }
+    return result?.data?.id || null;
+  } catch (err) {
+    console.error(`Apify trigger failed for zone ${zoneId} ${status}:`, err.message);
+    return null;
+  }
 }
