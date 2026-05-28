@@ -34,8 +34,10 @@ module.exports = async (req, res) => {
      console.log('SAMPLE LATLNG:', items[0].latitude, items[0].longitude);
    }
     for (const item of items) {
-      if (!item.latitude || !item.longitude) { skipped++; continue; }
-      if (!pointInPolygon({ lat: item.latitude, lng: item.longitude }, coords)) { skipped++; continue; }
+      const lat = item.latLong?.latitude;
+      const lng = item.latLong?.longitude;
+      if (!lat || !lng) { skipped++; continue; }
+      if (!pointInPolygon({ lat, lng }, coords)) { skipped++; continue; }
 
       const isSold = (item.statusType || '').toLowerCase().includes('sold');
       const row = {
