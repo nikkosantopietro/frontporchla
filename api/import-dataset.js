@@ -36,6 +36,10 @@ module.exports = async (req, res) => {
     for (const item of items) {
       const lat = item.latLong?.latitude;
       const lng = item.latLong?.longitude;
+      if (skipped < 2 && inserted < 2) {
+        console.log('CHECK:', lat, lng, 'inZone:', pointInPolygon({ lat, lng }, coords));
+        console.log('ZONE COORDS SAMPLE:', JSON.stringify(coords).substring(0, 300));
+      }
       if (!lat || !lng) { skipped++; continue; }
       if (!pointInPolygon({ lat, lng }, coords)) { skipped++; continue; }
 
