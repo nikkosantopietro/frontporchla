@@ -12,6 +12,13 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+// Helper: safely pull Zillow's nested home info out of raw_data.
+// The flat columns (price, sold_price, sold_date, days_on_market, zestimate)
+// are all NULL from the scraper — the real values live here.
+function homeInfo(row) {
+  return row?.raw_data?.hdpData?.homeInfo || {};
+}
+
 function buildZoneMapUrl(zone) {
   try {
     const coords = typeof zone.coordinates === 'string'
@@ -47,27 +54,23 @@ function buildZoneMapUrl(zone) {
   }
 }
 
-// Calculate market stats for a zone from the listings table
-// Filters: last 12 months sold, excludes rentals (price >= $100k)
+// Calculate market stats for a zone from the listings table.
+// Reads from raw_data.hdpData.homeInfo. Filters: last 12 months sold,
+// excludes rentals (price >= $100k).
 async function getZoneStats(zoneId) {
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-  const cutoff = oneYearAgo.toISOString().split('T')[0];
+  const cutoffMs = Date.now() - 365 * 24 * 60 * 60 * 1000;
 
   const { data: sold } = await supabase
     .from('listings')
-    .select('sold_price, price, sqft, days_on_market, sold_date')
+    .select('raw_data')
     .eq('zone_id', zoneId)
-    .eq('status', 'sold')
-    .gte('sold_price', 100000)
-    .or(`sold_date.gte.${cutoff},sold_date.is.null`);
+    .eq('status', 'sold');
 
   const { data: active } = await supabase
     .from('listings')
-    .select('id, price, sqft')
+    .select('raw_data')
     .eq('zone_id', zoneId)
-    .eq('status', 'for_sale')
-    .gte('price', 100000);
+    .eq('status', 'for_sale');
 
   const stats = {
     medianPrice: 'N/A',
@@ -78,37 +81,45 @@ async function getZoneStats(zoneId) {
     marketStatus: 'Balanced Market'
   };
 
-  if (sold && sold.length > 0) {
-    const prices = sold.map(s => s.sold_price || s.price).filter(p => p && p >= 100000).sort((a, b) => a - b);
+  // SOLD: keep only last-12-months, non-rental
+  const recentSolds = (sold || []).filter(r => {
+    const h = homeInfo(r);
+    return h.dateSold && h.dateSold >= cutoffMs && h.price >= 100000;
+  });
+
+  if (recentSolds.length > 0) {
+    const prices = recentSolds.map(r => homeInfo(r).price).filter(p => p >= 100000).sort((a, b) => a - b);
     if (prices.length > 0) {
       const mid = Math.floor(prices.length / 2);
       const median = prices.length % 2 ? prices[mid] : (prices[mid - 1] + prices[mid]) / 2;
       stats.medianPrice = formatCurrency(median);
     }
 
-    const ppsfValues = sold
-      .filter(s => (s.sold_price || s.price) >= 100000 && s.sqft && s.sqft > 200)
-      .map(s => (s.sold_price || s.price) / s.sqft);
-    if (ppsfValues.length > 0) {
-      const avgPpsf = ppsfValues.reduce((a, b) => a + b, 0) / ppsfValues.length;
-      stats.pricePerSqFt = '$' + Math.round(avgPpsf).toLocaleString();
+    const ppsf = recentSolds
+      .map(r => homeInfo(r))
+      .filter(h => h.price >= 100000 && h.livingArea > 200)
+      .map(h => h.price / h.livingArea);
+    if (ppsf.length > 0) {
+      stats.pricePerSqFt = '$' + Math.round(ppsf.reduce((a, b) => a + b, 0) / ppsf.length).toLocaleString();
     }
 
-    stats.homesSold = sold.length.toString();
+    stats.homesSold = recentSolds.length.toString();
 
-    const domValues = sold.map(s => s.days_on_market).filter(d => d != null && d >= 0 && d < 1000);
-    if (domValues.length > 0) {
-      const avgDom = domValues.reduce((a, b) => a + b, 0) / domValues.length;
-      stats.daysOnMarket = Math.round(avgDom).toString();
+    // daysOnZillow: -1 means withheld → exclude from average
+    const dom = recentSolds.map(r => homeInfo(r).daysOnZillow).filter(d => d != null && d >= 0 && d < 1000);
+    if (dom.length > 0) {
+      stats.daysOnMarket = Math.round(dom.reduce((a, b) => a + b, 0) / dom.length).toString();
     }
   }
 
-  if (active && active.length > 0) {
-    stats.activeListings = active.length.toString();
+  // ACTIVE: non-rental count
+  const activeListings = (active || []).filter(r => homeInfo(r).price >= 100000);
+  if (activeListings.length > 0) {
+    stats.activeListings = activeListings.length.toString();
   }
 
-  const soldCount = sold?.length || 0;
-  const activeCount = active?.length || 0;
+  const soldCount = recentSolds.length;
+  const activeCount = activeListings.length;
   if (soldCount > 0 || activeCount > 0) {
     if (activeCount === 0 || soldCount / Math.max(activeCount, 1) > 1.2) {
       stats.marketStatus = "Seller's Market";
@@ -122,16 +133,18 @@ async function getZoneStats(zoneId) {
   return stats;
 }
 
-// Find a subscriber's home value from listings, or estimate from zone comps
+// Find a subscriber's home value from listings, or estimate from zone comps.
+// Reads zestimate/price from raw_data.hdpData.homeInfo.
 async function getSubscriberValue(sub, zoneId) {
   if (sub.address) {
     const { data: match } = await supabase
       .from('listings')
-      .select('zestimate, price, sold_price')
+      .select('raw_data')
       .ilike('full_address', '%' + sub.address.split(',')[0] + '%')
       .limit(1);
     if (match && match.length > 0) {
-      const est = match[0].zestimate || match[0].price || match[0].sold_price;
+      const h = homeInfo(match[0]);
+      const est = h.zestimate || h.price;
       if (est) {
         return {
           estimate: est,
@@ -144,13 +157,14 @@ async function getSubscriberValue(sub, zoneId) {
 
   const { data: zoneListings } = await supabase
     .from('listings')
-    .select('zestimate')
-    .eq('zone_id', zoneId)
-    .not('zestimate', 'is', null)
-    .gte('zestimate', 100000);
+    .select('raw_data')
+    .eq('zone_id', zoneId);
 
   if (zoneListings && zoneListings.length > 0) {
-    const vals = zoneListings.map(l => l.zestimate).filter(Boolean).sort((a, b) => a - b);
+    const vals = zoneListings
+      .map(l => homeInfo(l).zestimate)
+      .filter(v => v && v >= 100000)
+      .sort((a, b) => a - b);
     if (vals.length > 0) {
       const mid = Math.floor(vals.length / 2);
       const median = vals.length % 2 ? vals[mid] : (vals[mid - 1] + vals[mid]) / 2;
