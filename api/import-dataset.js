@@ -93,3 +93,17 @@ function pointInPolygon(point, polygon) {
   }
   return inside;
 }
+
+function parsePrice(val) {
+  if (val == null) return null;
+  if (typeof val === 'number') return val;
+  let s = String(val).replace(/[$,\s]/g, '');
+  if (s.toUpperCase().endsWith('M')) {
+    return Math.round(parseFloat(s) * 1000000);
+  }
+  if (s.toUpperCase().endsWith('K')) {
+    return Math.round(parseFloat(s) * 1000);
+  }
+  const n = parseFloat(s);
+  return isNaN(n) ? null : n;
+}
