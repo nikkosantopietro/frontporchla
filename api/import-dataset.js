@@ -29,6 +29,10 @@ module.exports = async (req, res) => {
     const items = await resp.json();
 
     let inserted = 0, skipped = 0;
+    if (items.length > 0) {
+     console.log('SAMPLE KEYS:', Object.keys(items[0]).join(', '));
+     console.log('SAMPLE LATLNG:', items[0].latitude, items[0].longitude);
+   }
     for (const item of items) {
       if (!item.latitude || !item.longitude) { skipped++; continue; }
       if (!pointInPolygon({ lat: item.latitude, lng: item.longitude }, coords)) { skipped++; continue; }
