@@ -48,30 +48,38 @@ function buildZoneMapUrl(zone) {
 }
 
 // Calculate market stats for a zone from the listings table
+// Filters: last 12 months sold, excludes rentals (price >= $100k)
 async function getZoneStats(zoneId) {
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  const cutoff = oneYearAgo.toISOString().split('T')[0];
+
   const { data: sold } = await supabase
     .from('listings')
-    .select('sold_price, price, sqft, days_on_market, zestimate')
+    .select('sold_price, price, sqft, days_on_market, sold_date')
     .eq('zone_id', zoneId)
-    .eq('status', 'sold');
+    .eq('status', 'sold')
+    .gte('sold_price', 100000)
+    .or(`sold_date.gte.${cutoff},sold_date.is.null`);
 
   const { data: active } = await supabase
     .from('listings')
     .select('id, price, sqft')
     .eq('zone_id', zoneId)
-    .eq('status', 'for_sale');
+    .eq('status', 'for_sale')
+    .gte('price', 100000);
 
   const stats = {
     medianPrice: 'N/A',
     pricePerSqFt: 'N/A',
-    homesSold: 'N/A',
+    homesSold: '0',
     daysOnMarket: 'N/A',
-    activeListings: 'N/A',
+    activeListings: '0',
     marketStatus: 'Balanced Market'
   };
 
   if (sold && sold.length > 0) {
-    const prices = sold.map(s => s.sold_price || s.price).filter(Boolean).sort((a, b) => a - b);
+    const prices = sold.map(s => s.sold_price || s.price).filter(p => p && p >= 100000).sort((a, b) => a - b);
     if (prices.length > 0) {
       const mid = Math.floor(prices.length / 2);
       const median = prices.length % 2 ? prices[mid] : (prices[mid - 1] + prices[mid]) / 2;
@@ -79,7 +87,7 @@ async function getZoneStats(zoneId) {
     }
 
     const ppsfValues = sold
-      .filter(s => (s.sold_price || s.price) && s.sqft && s.sqft > 0)
+      .filter(s => (s.sold_price || s.price) >= 100000 && s.sqft && s.sqft > 200)
       .map(s => (s.sold_price || s.price) / s.sqft);
     if (ppsfValues.length > 0) {
       const avgPpsf = ppsfValues.reduce((a, b) => a + b, 0) / ppsfValues.length;
@@ -88,7 +96,7 @@ async function getZoneStats(zoneId) {
 
     stats.homesSold = sold.length.toString();
 
-    const domValues = sold.map(s => s.days_on_market).filter(d => d != null && d >= 0);
+    const domValues = sold.map(s => s.days_on_market).filter(d => d != null && d >= 0 && d < 1000);
     if (domValues.length > 0) {
       const avgDom = domValues.reduce((a, b) => a + b, 0) / domValues.length;
       stats.daysOnMarket = Math.round(avgDom).toString();
@@ -99,7 +107,6 @@ async function getZoneStats(zoneId) {
     stats.activeListings = active.length.toString();
   }
 
-  // Simple market temperature: more sold than active = seller's market
   const soldCount = sold?.length || 0;
   const activeCount = active?.length || 0;
   if (soldCount > 0 || activeCount > 0) {
@@ -117,7 +124,6 @@ async function getZoneStats(zoneId) {
 
 // Find a subscriber's home value from listings, or estimate from zone comps
 async function getSubscriberValue(sub, zoneId) {
-  // Try exact address match first
   if (sub.address) {
     const { data: match } = await supabase
       .from('listings')
@@ -136,12 +142,12 @@ async function getSubscriberValue(sub, zoneId) {
     }
   }
 
-  // Fallback: median zestimate of the zone
   const { data: zoneListings } = await supabase
     .from('listings')
     .select('zestimate')
     .eq('zone_id', zoneId)
-    .not('zestimate', 'is', null);
+    .not('zestimate', 'is', null)
+    .gte('zestimate', 100000);
 
   if (zoneListings && zoneListings.length > 0) {
     const vals = zoneListings.map(l => l.zestimate).filter(Boolean).sort((a, b) => a - b);
@@ -225,7 +231,6 @@ module.exports = async (req, res) => {
         const { zone, subscribers: zoneSubs } = byZone[zoneId];
         const zoneMapUrl = buildZoneMapUrl(zone);
 
-        // Real market stats from the listings table
         const marketStats = await getZoneStats(zoneId);
 
         let article = { title: zone?.name + ' in ' + month + ': What You Need to Know', body: 'Your ' + (zone?.name || 'neighborhood') + ' market continued to show strong activity this ' + month + '.' };
