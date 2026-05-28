@@ -9,7 +9,6 @@ const APIFY_TOKEN = process.env.APIFY_TOKEN;
 
 module.exports = async (req, res) => {
   const { zoneId, status, token } = req.query;
-
   if (token !== process.env.CRON_SECRET) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -17,7 +16,6 @@ module.exports = async (req, res) => {
   try {
     const payload = req.body;
     const datasetId = payload?.resource?.defaultDatasetId;
-
     if (!datasetId) {
       return res.status(400).json({ error: 'No dataset ID in webhook payload' });
     }
@@ -27,7 +25,6 @@ module.exports = async (req, res) => {
       .select('id, name, coordinates')
       .eq('id', zoneId)
       .single();
-
     if (!zone) {
       return res.status(404).json({ error: 'Zone not found' });
     }
@@ -46,36 +43,30 @@ module.exports = async (req, res) => {
     let skipped = 0;
 
     for (const item of items) {
-      if (!item.latitude || !item.longitude) {
-        skipped++;
-        continue;
-      }
-
-      const inZone = pointInPolygon({ lat: item.latitude, lng: item.longitude }, coords);
-      if (!inZone) {
-        skipped++;
-        continue;
-      }
+      const lat = item.latLong?.latitude;
+      const lng = item.latLong?.longitude;
+      if (!lat || !lng) { skipped++; continue; }
+      if (!pointInPolygon({ lat, lng }, coords)) { skipped++; continue; }
 
       const isSold = status === 'sold' || (item.statusType || '').toLowerCase().includes('sold');
 
       const listingData = {
         zpid: item.zpid?.toString(),
         detail_url: item.detailUrl,
-        street_address: item.address?.streetAddress,
-        city: item.address?.city,
-        state: item.address?.state,
-        zip: item.address?.zipcode,
-        full_address: [item.address?.streetAddress, item.address?.city, item.address?.state, item.address?.zipcode].filter(Boolean).join(', '),
-        latitude: item.latitude,
-        longitude: item.longitude,
+        street_address: item.addressStreet,
+        city: item.addressCity,
+        state: item.addressState,
+        zip: item.addressZipcode,
+        full_address: item.address,
+        latitude: lat,
+        longitude: lng,
         status: isSold ? 'sold' : (item.statusType?.toLowerCase().includes('pending') ? 'pending' : 'for_sale'),
         listing_type: isSold ? 'sold' : 'for_sale',
-        price: item.price || item.unformattedPrice,
-        sold_price: isSold ? (item.price || item.unformattedPrice) : null,
+        price: parsePrice(item.unformattedPrice),
+        sold_price: parsePrice(item.soldPrice) || (isSold ? parsePrice(item.unformattedPrice) : null),
         sold_date: item.dateSold ? new Date(item.dateSold).toISOString().split('T')[0] : null,
-        zestimate: item.zestimate,
-        rent_zestimate: item.rentZestimate,
+        zestimate: parsePrice(item.zestimate),
+        rent_zestimate: parsePrice(item.rentZestimate),
         beds: item.beds,
         baths: item.baths,
         sqft: item.area,
@@ -83,27 +74,23 @@ module.exports = async (req, res) => {
         home_type: item.hdpData?.homeInfo?.homeType,
         days_on_market: item.daysOnZillow,
         primary_photo: item.imgSrc,
-        photos: item.carouselPhotos || null,
+        photos: item.carouselPhotosComposable || null,
         zone_id: zone.id,
         raw_data: item,
         updated_at: new Date().toISOString()
       };
 
-      if (!listingData.zpid) {
-        skipped++;
-        continue;
-      }
+      if (!listingData.zpid) { skipped++; continue; }
 
       const { error } = await supabase
         .from('listings')
         .upsert(listingData, { onConflict: 'zpid' });
 
       if (!error) inserted++;
-      else skipped++;
+      else { skipped++; if (skipped < 3) console.log('INSERT ERROR:', JSON.stringify(error)); }
     }
 
     console.log(`Webhook complete for ${zone.name} (${status}): ${inserted} inserted, ${skipped} skipped`);
-
     return res.status(200).json({ success: true, inserted, skipped });
 
   } catch (err) {
@@ -121,4 +108,18 @@ function pointInPolygon(point, polygon) {
     if (intersect) inside = !inside;
   }
   return inside;
+}
+
+function parsePrice(val) {
+  if (val == null) return null;
+  if (typeof val === 'number') return val;
+  let s = String(val).replace(/[$,\s]/g, '');
+  if (s.toUpperCase().endsWith('M')) {
+    return Math.round(parseFloat(s) * 1000000);
+  }
+  if (s.toUpperCase().endsWith('K')) {
+    return Math.round(parseFloat(s) * 1000);
+  }
+  const n = parseFloat(s);
+  return isNaN(n) ? null : n;
 }
