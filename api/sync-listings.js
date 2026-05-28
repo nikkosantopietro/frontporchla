@@ -74,7 +74,7 @@ async function triggerApifyRun(bounds, status, zoneId) {
   }));
 
   const startUrl = `https://www.zillow.com/homes/${status === 'sold' ? 'sold' : 'for_sale'}/?searchQueryState=${searchUrlState}`;
-  const webhookUrl = `https://frontporchla.com/api/apify-webhook?zoneId=${zoneId}&status=${status}&token=${process.env.CRON_SECRET}`;
+  const webhookUrl = `https://project-zdwup.vercel.app/api/apify-webhook?zoneId=${zoneId}&status=${status}&token=${process.env.CRON_SECRET}`;
 
   try {
     const controller = new AbortController();
