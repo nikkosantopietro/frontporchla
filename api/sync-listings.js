@@ -15,9 +15,12 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { data: zones, error: zoneError } = await supabase
-      .from('zones')
-      .select('id, name, coordinates');
+   const testZone = req.query.zone;
+    let zoneQuery = supabase.from('zones').select('id, name, coordinates');
+    if (testZone) {
+      zoneQuery = zoneQuery.ilike('name', testZone);
+    }
+    const { data: zones, error: zoneError } = await zoneQuery;
 
     if (zoneError) throw zoneError;
     if (!zones || zones.length === 0) {
