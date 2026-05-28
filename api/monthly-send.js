@@ -106,7 +106,7 @@ async function getZoneStats(zoneId) {
     stats.homesSold = recentSolds.length.toString();
 
     // daysOnZillow: -1 means withheld → exclude from average
-    const dom = recentSolds.map(r => homeInfo(r).daysOnZillow).filter(d => d != null && d >= 0 && d < 1000);
+    const dom = recentSolds.map(r => homeInfo(r).daysOnZillow).filter(d => d != null && d >= 0 && d < 365);
     if (dom.length > 0) {
       stats.daysOnMarket = Math.round(dom.reduce((a, b) => a + b, 0) / dom.length).toString();
     }
