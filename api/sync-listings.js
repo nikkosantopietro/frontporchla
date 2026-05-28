@@ -87,7 +87,7 @@ async function triggerApifyRun(bounds, status, zoneId) {
       body: JSON.stringify({
         searchUrls: [{ url: startUrl }],
         extractionMethod: 'PAGINATION_WITH_ZOOM_IN',
-        maxItems: 500,
+        maxItems: 4,
         webhooks: [{
           eventTypes: ['ACTOR.RUN.SUCCEEDED'],
           requestUrl: webhookUrl
