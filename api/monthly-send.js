@@ -1,7 +1,6 @@
 const { createClient } = require('@supabase/supabase-js');
 const sgMail = require('@sendgrid/mail');
 const generateEmail = require('./email-template');
-const { getAVM, getMarketStats, getZipFromAddress } = require('./attom');
 const { generateArticle } = require('./generate-article');
 
 const supabase = createClient(
@@ -46,6 +45,119 @@ function buildZoneMapUrl(zone) {
     console.error('Zone map error:', err);
     return null;
   }
+}
+
+// Calculate market stats for a zone from the listings table
+async function getZoneStats(zoneId) {
+  const { data: sold } = await supabase
+    .from('listings')
+    .select('sold_price, price, sqft, days_on_market, zestimate')
+    .eq('zone_id', zoneId)
+    .eq('status', 'sold');
+
+  const { data: active } = await supabase
+    .from('listings')
+    .select('id, price, sqft')
+    .eq('zone_id', zoneId)
+    .eq('status', 'for_sale');
+
+  const stats = {
+    medianPrice: 'N/A',
+    pricePerSqFt: 'N/A',
+    homesSold: 'N/A',
+    daysOnMarket: 'N/A',
+    activeListings: 'N/A',
+    marketStatus: 'Balanced Market'
+  };
+
+  if (sold && sold.length > 0) {
+    const prices = sold.map(s => s.sold_price || s.price).filter(Boolean).sort((a, b) => a - b);
+    if (prices.length > 0) {
+      const mid = Math.floor(prices.length / 2);
+      const median = prices.length % 2 ? prices[mid] : (prices[mid - 1] + prices[mid]) / 2;
+      stats.medianPrice = formatCurrency(median);
+    }
+
+    const ppsfValues = sold
+      .filter(s => (s.sold_price || s.price) && s.sqft && s.sqft > 0)
+      .map(s => (s.sold_price || s.price) / s.sqft);
+    if (ppsfValues.length > 0) {
+      const avgPpsf = ppsfValues.reduce((a, b) => a + b, 0) / ppsfValues.length;
+      stats.pricePerSqFt = '$' + Math.round(avgPpsf).toLocaleString();
+    }
+
+    stats.homesSold = sold.length.toString();
+
+    const domValues = sold.map(s => s.days_on_market).filter(d => d != null && d >= 0);
+    if (domValues.length > 0) {
+      const avgDom = domValues.reduce((a, b) => a + b, 0) / domValues.length;
+      stats.daysOnMarket = Math.round(avgDom).toString();
+    }
+  }
+
+  if (active && active.length > 0) {
+    stats.activeListings = active.length.toString();
+  }
+
+  // Simple market temperature: more sold than active = seller's market
+  const soldCount = sold?.length || 0;
+  const activeCount = active?.length || 0;
+  if (soldCount > 0 || activeCount > 0) {
+    if (activeCount === 0 || soldCount / Math.max(activeCount, 1) > 1.2) {
+      stats.marketStatus = "Seller's Market";
+    } else if (soldCount / Math.max(activeCount, 1) < 0.6) {
+      stats.marketStatus = "Buyer's Market";
+    } else {
+      stats.marketStatus = 'Balanced Market';
+    }
+  }
+
+  return stats;
+}
+
+// Find a subscriber's home value from listings, or estimate from zone comps
+async function getSubscriberValue(sub, zoneId) {
+  // Try exact address match first
+  if (sub.address) {
+    const { data: match } = await supabase
+      .from('listings')
+      .select('zestimate, price, sold_price')
+      .ilike('full_address', '%' + sub.address.split(',')[0] + '%')
+      .limit(1);
+    if (match && match.length > 0) {
+      const est = match[0].zestimate || match[0].price || match[0].sold_price;
+      if (est) {
+        return {
+          estimate: est,
+          low: Math.round(est * 0.92),
+          high: Math.round(est * 1.08)
+        };
+      }
+    }
+  }
+
+  // Fallback: median zestimate of the zone
+  const { data: zoneListings } = await supabase
+    .from('listings')
+    .select('zestimate')
+    .eq('zone_id', zoneId)
+    .not('zestimate', 'is', null);
+
+  if (zoneListings && zoneListings.length > 0) {
+    const vals = zoneListings.map(l => l.zestimate).filter(Boolean).sort((a, b) => a - b);
+    if (vals.length > 0) {
+      const mid = Math.floor(vals.length / 2);
+      const median = vals.length % 2 ? vals[mid] : (vals[mid - 1] + vals[mid]) / 2;
+      return {
+        estimate: median,
+        low: Math.round(median * 0.92),
+        high: Math.round(median * 1.08),
+        isZoneEstimate: true
+      };
+    }
+  }
+
+  return null;
 }
 
 module.exports = async (req, res) => {
@@ -113,25 +225,24 @@ module.exports = async (req, res) => {
         const { zone, subscribers: zoneSubs } = byZone[zoneId];
         const zoneMapUrl = buildZoneMapUrl(zone);
 
-        const sampleAddress = zoneSubs[0]?.address;
-        const zip = getZipFromAddress(sampleAddress);
-        const marketStats = zip ? await getMarketStats(zip) : null;
+        // Real market stats from the listings table
+        const marketStats = await getZoneStats(zoneId);
 
-    let article = { title: zone?.name + ' in ' + month + ': What You Need to Know', body: 'Your ' + (zone?.name || 'neighborhood') + ' market continued to show strong activity this ' + month + '.' };
-try {
-  article = await generateArticle(
-    zone?.name || 'Your Neighborhood',
-    marketStats || {},
-    month,
-    year
-  );
-} catch (err) {
-  console.error('Article generation failed, using fallback:', err);
-}
+        let article = { title: zone?.name + ' in ' + month + ': What You Need to Know', body: 'Your ' + (zone?.name || 'neighborhood') + ' market continued to show strong activity this ' + month + '.' };
+        try {
+          article = await generateArticle(
+            zone?.name || 'Your Neighborhood',
+            marketStats || {},
+            month,
+            year
+          );
+        } catch (err) {
+          console.error('Article generation failed, using fallback:', err);
+        }
 
         for (const sub of zoneSubs) {
           try {
-            const avm = sub.address ? await getAVM(sub.address) : null;
+            const value = await getSubscriberValue(sub, zoneId);
 
             const templateData = {
               to: sub.email,
@@ -141,23 +252,23 @@ try {
               zoneName: zone?.name || 'Your Neighborhood',
               month,
               year,
-              medianPrice: marketStats?.medianPrice || 'N/A',
+              medianPrice: marketStats.medianPrice,
               medianPriceChange: '—',
-              pricePerSqFt: marketStats?.pricePerSqFt || 'N/A',
+              pricePerSqFt: marketStats.pricePerSqFt,
               pricePerSqFtChange: '—',
-              saleToList: marketStats?.saleToList || 'N/A',
-              homesSold: marketStats?.homesSold?.toString() || 'N/A',
+              saleToList: 'N/A',
+              homesSold: marketStats.homesSold,
               homesSoldChange: '—',
-              daysOnMarket: marketStats?.daysOnMarket || 'N/A',
+              daysOnMarket: marketStats.daysOnMarket,
               daysOnMarketChange: '—',
-              activeListings: 'N/A',
+              activeListings: marketStats.activeListings,
               activeListingsChange: '—',
-              marketStatus: marketStats?.saleToList && parseInt(marketStats.saleToList) >= 100 ? "Seller's Market" : "Buyer's Market",
+              marketStatus: marketStats.marketStatus,
               address: sub.address || '—',
-              avmEstimate: avm?.estimate ? formatCurrency(avm.estimate) : 'N/A',
-              avmLow: avm?.low ? formatCurrency(avm.low) : 'N/A',
-              avmHigh: avm?.high ? formatCurrency(avm.high) : 'N/A',
-              avmChange: avm?.change ? (avm.change > 0 ? '↑ ' : '↓ ') + formatCurrency(Math.abs(avm.change)) : '—',
+              avmEstimate: value?.estimate ? formatCurrency(value.estimate) : 'N/A',
+              avmLow: value?.low ? formatCurrency(value.low) : 'N/A',
+              avmHigh: value?.high ? formatCurrency(value.high) : 'N/A',
+              avmChange: '—',
               articleTitle: article.title,
               articleBody: article.body,
               listingsUrl: 'https://frontporchla.com',
