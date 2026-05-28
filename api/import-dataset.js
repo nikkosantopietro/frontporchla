@@ -73,7 +73,7 @@ module.exports = async (req, res) => {
       };
       if (!row.zpid) { skipped++; continue; }
       const { error } = await supabase.from('listings').upsert(row, { onConflict: 'zpid' });
-      if (!error) inserted++; else { skipped++; console.error(error); }
+     if (!error) inserted++; else { skipped++; if (skipped < 3) console.log('INSERT ERROR:', JSON.stringify(error)); }
     }
 
     return res.status(200).json({ success: true, inserted, skipped, total: items.length });
