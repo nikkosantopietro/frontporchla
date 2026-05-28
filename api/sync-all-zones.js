@@ -12,11 +12,23 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { data: zones } = await supabase.from('zones').select('name');
-    if (!zones || zones.length === 0) {
-      return res.status(200).json({ success: true, message: 'No zones' });
+   // Only sync zones that have at least one active subscriber
+    const { data: subs } = await supabase
+      .from('subscribers')
+      .select('zone_id, zones(name)')
+      .eq('unsubscribed', false)
+      .not('zone_id', 'is', null);
+
+    if (!subs || subs.length === 0) {
+      return res.status(200).json({ success: true, message: 'No subscribers in any zone' });
     }
 
+    const zoneNames = [...new Set(subs.map(s => s.zones?.name).filter(Boolean))];
+    const zones = zoneNames.map(name => ({ name }));
+
+    if (zones.length === 0) {
+      return res.status(200).json({ success: true, message: 'No active zones' });
+    }
     const base = 'https://project-zdwup.vercel.app/api/sync-listings';
     const triggered = [];
 
