@@ -1,0 +1,32 @@
+{
+  "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/score-reset",
+      "schedule": "0 15 1 * *"
+    },
+    {
+      "path": "/api/monthly-send",
+      "schedule": "0 16 1 * *"
+    },
+    {
+      "path": "/api/sync-all-zones",
+      "schedule": "0 13 27 * *"
+    },
+    {
+      "path": "/api/verify-stats",
+      "schedule": "0 12 * * *"
+    }
+  ]
+}
